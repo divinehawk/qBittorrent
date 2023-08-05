@@ -164,7 +164,7 @@ private slots:
     void on_actionExit_triggered();
     void on_actionLock_triggered();
     // Check for unpaused downloading or seeding torrents and prevent system suspend/sleep according to preferences
-    void updatePowerManagementState();
+    void updatePowerManagementState() const;
 
     void toolbarMenuRequested();
     void toolbarIconsOnly();
@@ -202,6 +202,7 @@ private:
     QFileSystemWatcher *m_executableWatcher = nullptr;
     // GUI related
     bool m_posInitialized = false;
+    bool m_neverShown = true;
     QPointer<QTabWidget> m_tabs;
     QPointer<StatusBar> m_statusBar;
     QPointer<OptionsDialog> m_options;

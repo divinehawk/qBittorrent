@@ -52,6 +52,7 @@
 #include "base/rss/rss_session.h"
 #include "base/torrentfileguard.h"
 #include "base/torrentfileswatcher.h"
+#include "base/utils/io.h"
 #include "base/utils/misc.h"
 #include "base/utils/net.h"
 #include "base/utils/password.h"
@@ -85,7 +86,7 @@ namespace
         const QDate date {2018, 11, 5};  // Monday
         QStringList ret;
         for (int i = 0; i < 7; ++i)
-            ret.append(locale.toString(date.addDays(i), u"dddd"_qs));
+            ret.append(locale.toString(date.addDays(i), u"dddd"_s));
         return ret;
     }
 
@@ -112,9 +113,9 @@ OptionsDialog::OptionsDialog(IGUIApplication *app, QWidget *parent)
     : QDialog(parent)
     , GUIApplicationComponent(app)
     , m_ui {new Ui::OptionsDialog}
-    , m_storeDialogSize {SETTINGS_KEY(u"Size"_qs)}
-    , m_storeHSplitterSize {SETTINGS_KEY(u"HorizontalSplitterSizes"_qs)}
-    , m_storeLastViewedPage {SETTINGS_KEY(u"LastViewedPage"_qs)}
+    , m_storeDialogSize {SETTINGS_KEY(u"Size"_s)}
+    , m_storeHSplitterSize {SETTINGS_KEY(u"HorizontalSplitterSizes"_s)}
+    , m_storeLastViewedPage {SETTINGS_KEY(u"LastViewedPage"_s)}
 {
     m_ui->setupUi(this);
     m_applyButton = m_ui->buttonBox->button(QDialogButtonBox::Apply);
@@ -127,18 +128,18 @@ OptionsDialog::OptionsDialog(IGUIApplication *app, QWidget *parent)
     m_ui->hsplitter->setCollapsible(1, false);
 
     // Main icons
-    m_ui->tabSelection->item(TAB_UI)->setIcon(UIThemeManager::instance()->getIcon(u"preferences-desktop"_qs));
-    m_ui->tabSelection->item(TAB_BITTORRENT)->setIcon(UIThemeManager::instance()->getIcon(u"preferences-bittorrent"_qs, u"preferences-system-network"_qs));
-    m_ui->tabSelection->item(TAB_CONNECTION)->setIcon(UIThemeManager::instance()->getIcon(u"network-connect"_qs, u"network-wired"_qs));
-    m_ui->tabSelection->item(TAB_DOWNLOADS)->setIcon(UIThemeManager::instance()->getIcon(u"download"_qs, u"folder-download"_qs));
-    m_ui->tabSelection->item(TAB_SPEED)->setIcon(UIThemeManager::instance()->getIcon(u"speedometer"_qs, u"chronometer"_qs));
-    m_ui->tabSelection->item(TAB_RSS)->setIcon(UIThemeManager::instance()->getIcon(u"application-rss"_qs, u"application-rss+xml"_qs));
+    m_ui->tabSelection->item(TAB_UI)->setIcon(UIThemeManager::instance()->getIcon(u"preferences-desktop"_s));
+    m_ui->tabSelection->item(TAB_BITTORRENT)->setIcon(UIThemeManager::instance()->getIcon(u"preferences-bittorrent"_s, u"preferences-system-network"_s));
+    m_ui->tabSelection->item(TAB_CONNECTION)->setIcon(UIThemeManager::instance()->getIcon(u"network-connect"_s, u"network-wired"_s));
+    m_ui->tabSelection->item(TAB_DOWNLOADS)->setIcon(UIThemeManager::instance()->getIcon(u"download"_s, u"folder-download"_s));
+    m_ui->tabSelection->item(TAB_SPEED)->setIcon(UIThemeManager::instance()->getIcon(u"speedometer"_s, u"chronometer"_s));
+    m_ui->tabSelection->item(TAB_RSS)->setIcon(UIThemeManager::instance()->getIcon(u"application-rss"_s, u"application-rss+xml"_s));
 #ifdef DISABLE_WEBUI
     m_ui->tabSelection->item(TAB_WEBUI)->setHidden(true);
 #else
-    m_ui->tabSelection->item(TAB_WEBUI)->setIcon(UIThemeManager::instance()->getIcon(u"preferences-webui"_qs, u"network-server"_qs));
+    m_ui->tabSelection->item(TAB_WEBUI)->setIcon(UIThemeManager::instance()->getIcon(u"preferences-webui"_s, u"network-server"_s));
 #endif
-    m_ui->tabSelection->item(TAB_ADVANCED)->setIcon(UIThemeManager::instance()->getIcon(u"preferences-advanced"_qs, u"preferences-other"_qs));
+    m_ui->tabSelection->item(TAB_ADVANCED)->setIcon(UIThemeManager::instance()->getIcon(u"preferences-advanced"_s, u"preferences-other"_s));
 
     // set uniform size for all icons
     int maxHeight = -1;
@@ -172,7 +173,7 @@ OptionsDialog::OptionsDialog(IGUIApplication *app, QWidget *parent)
     m_applyButton->setEnabled(false);
     connect(m_applyButton, &QPushButton::clicked, this, &OptionsDialog::applySettings);
 
-    // disable mouse wheel event on widgets to avoid mis-selection
+    // disable mouse wheel event on widgets to avoid misselection
     auto *wheelEventEater = new WheelEventEater(this);
     for (QComboBox *widget : asConst(findChildren<QComboBox *>()))
         widget->installEventFilter(wheelEventEater);
@@ -253,6 +254,7 @@ void OptionsDialog::loadBehaviorTabOptions()
     m_ui->checkShowSplash->setChecked(!pref->isSplashScreenDisabled());
     m_ui->checkProgramExitConfirm->setChecked(pref->confirmOnExit());
     m_ui->checkProgramAutoExitConfirm->setChecked(!pref->dontConfirmAutoExit());
+    m_ui->checkConfirmPauseAndResumeAll->setChecked(pref->confirmPauseAndResumeAll());
 
     m_ui->windowStateComboBox->addItem(tr("Normal"), QVariant::fromValue(WindowState::Normal));
     m_ui->windowStateComboBox->addItem(tr("Minimized"), QVariant::fromValue(WindowState::Minimized));
@@ -334,7 +336,7 @@ void OptionsDialog::loadBehaviorTabOptions()
     });
     connect(m_ui->buttonCustomizeUITheme, &QPushButton::clicked, this, [this]
     {
-        auto dialog = new UIThemeDialog(this);
+        auto *dialog = new UIThemeDialog(this);
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->open();
     });
@@ -354,6 +356,7 @@ void OptionsDialog::loadBehaviorTabOptions()
     connect(m_ui->checkShowSplash, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->checkProgramExitConfirm, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->checkProgramAutoExitConfirm, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+    connect(m_ui->checkConfirmPauseAndResumeAll, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->checkShowSystray, &QGroupBox::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->checkMinimizeToSysTray, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->checkCloseToSystray, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
@@ -398,7 +401,7 @@ void OptionsDialog::saveBehaviorTabOptions() const
     if (pref->getLocale() != locale)
     {
         auto *translator = new QTranslator;
-        if (translator->load(u":/lang/qbittorrent_"_qs + locale))
+        if (translator->load(u":/lang/qbittorrent_"_s + locale))
             qDebug("%s locale recognized, using translation.", qUtf8Printable(locale));
         else
             qDebug("%s locale unrecognized, using default (en).", qUtf8Printable(locale));
@@ -425,6 +428,7 @@ void OptionsDialog::saveBehaviorTabOptions() const
     pref->setSplashScreenDisabled(isSplashScreenDisabled());
     pref->setConfirmOnExit(m_ui->checkProgramExitConfirm->isChecked());
     pref->setDontConfirmAutoExit(!m_ui->checkProgramAutoExitConfirm->isChecked());
+    pref->setConfirmPauseAndResumeAll(m_ui->checkConfirmPauseAndResumeAll->isChecked());
 
 #ifdef Q_OS_WIN
     pref->setWinStartup(WinStartup());
@@ -499,6 +503,15 @@ void OptionsDialog::loadDownloadsTabOptions()
     m_ui->stopConditionComboBox->setCurrentIndex(m_ui->stopConditionComboBox->findData(QVariant::fromValue(session->torrentStopCondition())));
     m_ui->stopConditionLabel->setEnabled(!m_ui->checkStartPaused->isChecked());
     m_ui->stopConditionComboBox->setEnabled(!m_ui->checkStartPaused->isChecked());
+
+    m_ui->checkMergeTrackers->setChecked(session->isMergeTrackersEnabled());
+    m_ui->checkConfirmMergeTrackers->setEnabled(m_ui->checkAdditionDialog->isChecked());
+    m_ui->checkConfirmMergeTrackers->setChecked(m_ui->checkConfirmMergeTrackers->isEnabled() ? pref->confirmMergeTrackers() : false);
+    connect(m_ui->checkAdditionDialog, &QGroupBox::toggled, this, [this, pref]
+    {
+        m_ui->checkConfirmMergeTrackers->setEnabled(m_ui->checkAdditionDialog->isChecked());
+        m_ui->checkConfirmMergeTrackers->setChecked(m_ui->checkConfirmMergeTrackers->isEnabled() ? pref->confirmMergeTrackers() : false);
+    });
 
     const TorrentFileGuard::AutoDeleteMode autoDeleteMode = TorrentFileGuard::autoDeleteMode();
     m_ui->deleteTorrentBox->setChecked(autoDeleteMode != TorrentFileGuard::Never);
@@ -585,7 +598,7 @@ void OptionsDialog::loadDownloadsTabOptions()
 #else
     m_ui->autoRunConsole->hide();
 #endif
-    const auto autoRunStr = u"%1\n    %2\n    %3\n    %4\n    %5\n    %6\n    %7\n    %8\n    %9\n    %10\n    %11\n    %12\n    %13\n%14"_qs
+    const auto autoRunStr = u"%1\n    %2\n    %3\n    %4\n    %5\n    %6\n    %7\n    %8\n    %9\n    %10\n    %11\n    %12\n    %13\n%14"_s
         .arg(tr("Supported parameters (case sensitive):")
             , tr("%N: Torrent name")
             , tr("%L: Category")
@@ -615,6 +628,10 @@ void OptionsDialog::loadDownloadsTabOptions()
         m_ui->stopConditionComboBox->setEnabled(!checked);
     });
     connect(m_ui->stopConditionComboBox, qComboBoxCurrentIndexChanged, this, &ThisType::enableApplyButton);
+    connect(m_ui->checkMergeTrackers, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+    connect(m_ui->checkConfirmMergeTrackers, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+    connect(m_ui->deleteTorrentBox, &QGroupBox::toggled, m_ui->deleteTorrentWarningIcon, &QWidget::setVisible);
+    connect(m_ui->deleteTorrentBox, &QGroupBox::toggled, m_ui->deleteTorrentWarningLabel, &QWidget::setVisible);
     connect(m_ui->deleteTorrentBox, &QGroupBox::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->deleteCancelledTorrentBox, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
 
@@ -657,8 +674,9 @@ void OptionsDialog::loadDownloadsTabOptions()
     connect(m_ui->mailNotifUsername, &QLineEdit::textChanged, this, &ThisType::enableApplyButton);
     connect(m_ui->mailNotifPassword, &QLineEdit::textChanged, this, &ThisType::enableApplyButton);
 
-    connect(m_ui->autoRunBox, &QGroupBox::toggled, this, &ThisType::enableApplyButton);
+    connect(m_ui->groupBoxRunOnAdded, &QGroupBox::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->lineEditRunOnAdded, &QLineEdit::textChanged, this, &ThisType::enableApplyButton);
+    connect(m_ui->groupBoxRunOnFinished, &QGroupBox::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->lineEditRunOnFinished, &QLineEdit::textChanged, this, &ThisType::enableApplyButton);
     connect(m_ui->autoRunConsole, &QCheckBox::toggled, this, &ThisType::enableApplyButton);
 }
@@ -679,6 +697,9 @@ void OptionsDialog::saveDownloadsTabOptions() const
     TorrentFileGuard::setAutoDeleteMode(!m_ui->deleteTorrentBox->isChecked() ? TorrentFileGuard::Never
                              : !m_ui->deleteCancelledTorrentBox->isChecked() ? TorrentFileGuard::IfAdded
                              : TorrentFileGuard::Always);
+    session->setMergeTrackersEnabled(m_ui->checkMergeTrackers->isChecked());
+    if (m_ui->checkConfirmMergeTrackers->isEnabled())
+        pref->setConfirmMergeTrackers(m_ui->checkConfirmMergeTrackers->isChecked());
 
     session->setPreallocationEnabled(preAllocateAllFiles());
     session->setAppendExtensionEnabled(m_ui->checkAppendqB->isChecked());
@@ -698,7 +719,7 @@ void OptionsDialog::saveDownloadsTabOptions() const
     session->setTorrentExportDirectory(getTorrentExportDir());
     session->setFinishedTorrentExportDirectory(getFinishedTorrentExportDir());
 
-    auto watchedFoldersModel = static_cast<WatchedFoldersModel *>(m_ui->scanFoldersView->model());
+    auto *watchedFoldersModel = static_cast<WatchedFoldersModel *>(m_ui->scanFoldersView->model());
     watchedFoldersModel->apply();
 
     session->setExcludedFileNamesEnabled(m_ui->groupExcludedFileNames->isChecked());
@@ -787,14 +808,19 @@ void OptionsDialog::loadConnectionTabOptions()
         m_ui->spinMaxUploadsPerTorrent->setEnabled(false);
     }
 
+#if defined(QBT_USES_LIBTORRENT2) && TORRENT_USE_I2P
     m_ui->textI2PHost->setText(session->I2PAddress());
     m_ui->spinI2PPort->setValue(session->I2PPort());
     m_ui->checkI2PMixed->setChecked(session->I2PMixedMode());
     m_ui->groupI2P->setChecked(session->isI2PEnabled());
+#else
+    m_ui->groupI2P->hide();
+#endif
 
     const auto *proxyConfigManager = Net::ProxyConfigurationManager::instance();
     const Net::ProxyConfiguration proxyConf = proxyConfigManager->proxyConfiguration();
 
+    m_ui->comboProxyType->addItem(tr("(None)"), QVariant::fromValue(Net::ProxyType::None));
     m_ui->comboProxyType->addItem(tr("SOCKS4"), QVariant::fromValue(Net::ProxyType::SOCKS4));
     m_ui->comboProxyType->addItem(tr("SOCKS5"), QVariant::fromValue(Net::ProxyType::SOCKS5));
     m_ui->comboProxyType->addItem(tr("HTTP"), QVariant::fromValue(Net::ProxyType::HTTP));
@@ -819,7 +845,7 @@ void OptionsDialog::loadConnectionTabOptions()
     m_ui->textFilterPath->setFileNameFilter(tr("All supported filters") + u" (*.dat *.p2p *.p2b);;.dat (*.dat);;.p2p (*.p2p);;.p2b (*.p2b)");
     m_ui->textFilterPath->setSelectedPath(session->IPFilterFile());
 
-    m_ui->IpFilterRefreshBtn->setIcon(UIThemeManager::instance()->getIcon(u"view-refresh"_qs));
+    m_ui->IpFilterRefreshBtn->setIcon(UIThemeManager::instance()->getIcon(u"view-refresh"_s));
     m_ui->IpFilterRefreshBtn->setEnabled(m_ui->checkIPFilter->isChecked());
     m_ui->checkIpFilterTrackers->setChecked(session->isTrackerFilteringEnabled());
 
@@ -827,9 +853,13 @@ void OptionsDialog::loadConnectionTabOptions()
     connect(m_ui->spinPort, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
     connect(m_ui->checkUPnP, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
 
+    connect(m_ui->checkMaxConnections, &QAbstractButton::toggled, m_ui->spinMaxConnec, &QWidget::setEnabled);
     connect(m_ui->checkMaxConnections, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+    connect(m_ui->checkMaxConnectionsPerTorrent, &QAbstractButton::toggled, m_ui->spinMaxConnecPerTorrent, &QWidget::setEnabled);
     connect(m_ui->checkMaxConnectionsPerTorrent, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+    connect(m_ui->checkMaxUploads, &QAbstractButton::toggled, m_ui->spinMaxUploads, &QWidget::setEnabled);
     connect(m_ui->checkMaxUploads, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+    connect(m_ui->checkMaxUploadsPerTorrent, &QAbstractButton::toggled, m_ui->spinMaxUploadsPerTorrent, &QWidget::setEnabled);
     connect(m_ui->checkMaxUploadsPerTorrent, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->spinMaxConnec, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
     connect(m_ui->spinMaxConnecPerTorrent, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
@@ -841,10 +871,12 @@ void OptionsDialog::loadConnectionTabOptions()
     connect(m_ui->textProxyIP, &QLineEdit::textChanged, this, &ThisType::enableApplyButton);
     connect(m_ui->spinProxyPort, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
 
+#if defined(QBT_USES_LIBTORRENT2) && TORRENT_USE_I2P
     connect(m_ui->textI2PHost, &QLineEdit::textChanged, this, &ThisType::enableApplyButton);
     connect(m_ui->spinI2PPort, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
     connect(m_ui->checkI2PMixed, &QCheckBox::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->groupI2P, &QGroupBox::toggled, this, &ThisType::enableApplyButton);
+#endif
 
     connect(m_ui->checkProxyBitTorrent, &QGroupBox::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->checkProxyBitTorrent, &QGroupBox::toggled, this, &ThisType::adjustProxyOptions);
@@ -877,12 +909,14 @@ void OptionsDialog::saveConnectionTabOptions() const
     session->setMaxUploads(getMaxUploads());
     session->setMaxUploadsPerTorrent(getMaxUploadsPerTorrent());
 
+#if defined(QBT_USES_LIBTORRENT2) && TORRENT_USE_I2P
     session->setI2PEnabled(m_ui->groupI2P->isChecked());
     session->setI2PAddress(m_ui->textI2PHost->text().trimmed());
     session->setI2PPort(m_ui->spinI2PPort->value());
     session->setI2PMixedMode(m_ui->checkI2PMixed->isChecked());
+#endif
 
-    auto proxyConfigManager = Net::ProxyConfigurationManager::instance();
+    auto *proxyConfigManager = Net::ProxyConfigurationManager::instance();
     Net::ProxyConfiguration proxyConf;
     proxyConf.type = getProxyType();
     proxyConf.ip = getProxyIp();
@@ -910,11 +944,11 @@ void OptionsDialog::loadSpeedTabOptions()
     const auto *pref = Preferences::instance();
     const auto *session = BitTorrent::Session::instance();
 
-    m_ui->labelGlobalRate->setPixmap(UIThemeManager::instance()->getScaledPixmap(u"slow_off"_qs, Utils::Gui::mediumIconSize(this).height()));
+    m_ui->labelGlobalRate->setPixmap(UIThemeManager::instance()->getScaledPixmap(u"slow_off"_s, Utils::Gui::mediumIconSize(this).height()));
     m_ui->spinUploadLimit->setValue(session->globalUploadSpeedLimit() / 1024);
     m_ui->spinDownloadLimit->setValue(session->globalDownloadSpeedLimit() / 1024);
 
-    m_ui->labelAltRate->setPixmap(UIThemeManager::instance()->getScaledPixmap(u"slow"_qs, Utils::Gui::mediumIconSize(this).height()));
+    m_ui->labelAltRate->setPixmap(UIThemeManager::instance()->getScaledPixmap(u"slow"_s, Utils::Gui::mediumIconSize(this).height()));
     m_ui->spinUploadLimitAlt->setValue(session->altGlobalUploadSpeedLimit() / 1024);
     m_ui->spinDownloadLimitAlt->setValue(session->altGlobalDownloadSpeedLimit() / 1024);
 
@@ -1021,7 +1055,20 @@ void OptionsDialog::loadBittorrentTabOptions()
         m_ui->checkMaxSeedingMinutes->setChecked(false);
         m_ui->spinMaxSeedingMinutes->setEnabled(false);
     }
-    m_ui->comboRatioLimitAct->setEnabled((session->globalMaxSeedingMinutes() >= 0) || (session->globalMaxRatio() >= 0.));
+    if (session->globalMaxInactiveSeedingMinutes() >= 0)
+    {
+        // Enable
+        m_ui->checkMaxInactiveSeedingMinutes->setChecked(true);
+        m_ui->spinMaxInactiveSeedingMinutes->setEnabled(true);
+        m_ui->spinMaxInactiveSeedingMinutes->setValue(session->globalMaxInactiveSeedingMinutes());
+    }
+    else
+    {
+        // Disable
+        m_ui->checkMaxInactiveSeedingMinutes->setChecked(false);
+        m_ui->spinMaxInactiveSeedingMinutes->setEnabled(false);
+    }
+    m_ui->comboRatioLimitAct->setEnabled((session->globalMaxSeedingMinutes() >= 0) || (session->globalMaxRatio() >= 0.) || (session->globalMaxInactiveSeedingMinutes() >= 0));
 
     const QHash<MaxRatioAction, int> actIndex =
     {
@@ -1052,13 +1099,19 @@ void OptionsDialog::loadBittorrentTabOptions()
     connect(m_ui->spinUploadRateForSlowTorrents, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
     connect(m_ui->spinSlowTorrentsInactivityTimer, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
 
-    connect(m_ui->checkMaxRatio, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+    connect(m_ui->checkMaxRatio, &QAbstractButton::toggled, m_ui->spinMaxRatio, &QWidget::setEnabled);
     connect(m_ui->checkMaxRatio, &QAbstractButton::toggled, this, &ThisType::toggleComboRatioLimitAct);
+    connect(m_ui->checkMaxRatio, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->spinMaxRatio, qOverload<double>(&QDoubleSpinBox::valueChanged),this, &ThisType::enableApplyButton);
     connect(m_ui->comboRatioLimitAct, qComboBoxCurrentIndexChanged, this, &ThisType::enableApplyButton);
-    connect(m_ui->checkMaxSeedingMinutes, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+    connect(m_ui->checkMaxSeedingMinutes, &QAbstractButton::toggled, m_ui->spinMaxSeedingMinutes, &QWidget::setEnabled);
     connect(m_ui->checkMaxSeedingMinutes, &QAbstractButton::toggled, this, &ThisType::toggleComboRatioLimitAct);
+    connect(m_ui->checkMaxSeedingMinutes, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->spinMaxSeedingMinutes, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
+    connect(m_ui->checkMaxInactiveSeedingMinutes, &QAbstractButton::toggled, m_ui->spinMaxInactiveSeedingMinutes, &QWidget::setEnabled);
+    connect(m_ui->checkMaxInactiveSeedingMinutes, &QAbstractButton::toggled, this, &ThisType::toggleComboRatioLimitAct);
+    connect(m_ui->checkMaxInactiveSeedingMinutes, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
+    connect(m_ui->spinMaxInactiveSeedingMinutes, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
 
     connect(m_ui->checkEnableAddTrackers, &QGroupBox::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->textTrackers, &QPlainTextEdit::textChanged, this, &ThisType::enableApplyButton);
@@ -1087,6 +1140,7 @@ void OptionsDialog::saveBittorrentTabOptions() const
 
     session->setGlobalMaxRatio(getMaxRatio());
     session->setGlobalMaxSeedingMinutes(getMaxSeedingMinutes());
+    session->setGlobalMaxInactiveSeedingMinutes(getMaxInactiveSeedingMinutes());
     const QVector<MaxRatioAction> actIndex =
     {
         Pause,
@@ -1205,7 +1259,7 @@ void OptionsDialog::loadWebUITabOptions()
 
     connect(m_ui->checkBypassLocalAuth, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
     connect(m_ui->checkBypassAuthSubnetWhitelist, &QAbstractButton::toggled, this, &ThisType::enableApplyButton);
-    connect(m_ui->checkBypassAuthSubnetWhitelist, &QAbstractButton::toggled, m_ui->IPSubnetWhitelistButton, &QPushButton::setEnabled);
+    connect(m_ui->checkBypassAuthSubnetWhitelist, &QAbstractButton::toggled, m_ui->IPSubnetWhitelistButton, &QWidget::setEnabled);
     connect(m_ui->spinBanCounter, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
     connect(m_ui->spinBanDuration, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
     connect(m_ui->spinSessionTimeout, qSpinBoxValueChanged, this, &ThisType::enableApplyButton);
@@ -1280,11 +1334,11 @@ void OptionsDialog::saveWebUITabOptions() const
 void OptionsDialog::initializeLanguageCombo()
 {
     // List language files
-    const QDir langDir(u":/lang"_qs);
-    const QStringList langFiles = langDir.entryList(QStringList(u"qbittorrent_*.qm"_qs), QDir::Files);
+    const QDir langDir(u":/lang"_s);
+    const QStringList langFiles = langDir.entryList(QStringList(u"qbittorrent_*.qm"_s), QDir::Files);
     for (const QString &langFile : langFiles)
     {
-        const QString localeStr = langFile.section(u"_"_qs, 1, -1).section(u"."_qs, 0, 0); // remove "qbittorrent_" and ".qm"
+        const QString localeStr = langFile.section(u"_"_s, 1, -1).section(u"."_s, 0, 0); // remove "qbittorrent_" and ".qm"
         m_ui->comboI18n->addItem(/*QIcon(":/icons/flags/"+country+".svg"), */ Utils::Misc::languageToLocalizedString(localeStr), localeStr);
         qDebug() << "Supported locale:" << localeStr;
     }
@@ -1414,6 +1468,14 @@ int OptionsDialog::getMaxSeedingMinutes() const
     return -1;
 }
 
+// Return Inactive Seeding Minutes
+int OptionsDialog::getMaxInactiveSeedingMinutes() const
+{
+    return m_ui->checkMaxInactiveSeedingMinutes->isChecked()
+        ? m_ui->spinMaxInactiveSeedingMinutes->value()
+        : -1;
+}
+
 // Return max connections number
 int OptionsDialog::getMaxConnections() const
 {
@@ -1518,32 +1580,59 @@ void OptionsDialog::enableApplyButton()
 void OptionsDialog::toggleComboRatioLimitAct()
 {
     // Verify if the share action button must be enabled
-    m_ui->comboRatioLimitAct->setEnabled(m_ui->checkMaxRatio->isChecked() || m_ui->checkMaxSeedingMinutes->isChecked());
+    m_ui->comboRatioLimitAct->setEnabled(m_ui->checkMaxRatio->isChecked() || m_ui->checkMaxSeedingMinutes->isChecked() || m_ui->checkMaxInactiveSeedingMinutes->isChecked());
 }
 
 void OptionsDialog::adjustProxyOptions()
 {
     const auto currentProxyType = m_ui->comboProxyType->currentData().value<Net::ProxyType>();
-    const bool isAuthSupported = (currentProxyType != Net::ProxyType::SOCKS4);
+    const bool isAuthSupported = ((currentProxyType == Net::ProxyType::SOCKS5)
+            || (currentProxyType == Net::ProxyType::HTTP));
 
     m_ui->checkProxyAuth->setEnabled(isAuthSupported);
 
-    if (currentProxyType == Net::ProxyType::SOCKS4)
+    if (currentProxyType == Net::ProxyType::None)
     {
-        m_ui->labelProxyTypeIncompatible->setVisible(true);
+        m_ui->labelProxyTypeIncompatible->setVisible(false);
+
+        m_ui->lblProxyIP->setEnabled(false);
+        m_ui->textProxyIP->setEnabled(false);
+        m_ui->lblProxyPort->setEnabled(false);
+        m_ui->spinProxyPort->setEnabled(false);
 
         m_ui->checkProxyHostnameLookup->setEnabled(false);
         m_ui->checkProxyRSS->setEnabled(false);
         m_ui->checkProxyMisc->setEnabled(false);
+        m_ui->checkProxyBitTorrent->setEnabled(false);
+        m_ui->checkProxyPeerConnections->setEnabled(false);
     }
     else
     {
-        // SOCKS5 or HTTP
-        m_ui->labelProxyTypeIncompatible->setVisible(false);
+        m_ui->lblProxyIP->setEnabled(true);
+        m_ui->textProxyIP->setEnabled(true);
+        m_ui->lblProxyPort->setEnabled(true);
+        m_ui->spinProxyPort->setEnabled(true);
 
-        m_ui->checkProxyHostnameLookup->setEnabled(true);
-        m_ui->checkProxyRSS->setEnabled(true);
-        m_ui->checkProxyMisc->setEnabled(true);
+        m_ui->checkProxyBitTorrent->setEnabled(true);
+        m_ui->checkProxyPeerConnections->setEnabled(true);
+
+        if (currentProxyType == Net::ProxyType::SOCKS4)
+        {
+            m_ui->labelProxyTypeIncompatible->setVisible(true);
+
+            m_ui->checkProxyHostnameLookup->setEnabled(false);
+            m_ui->checkProxyRSS->setEnabled(false);
+            m_ui->checkProxyMisc->setEnabled(false);
+        }
+        else
+        {
+            // SOCKS5 or HTTP
+            m_ui->labelProxyTypeIncompatible->setVisible(false);
+
+            m_ui->checkProxyHostnameLookup->setEnabled(true);
+            m_ui->checkProxyRSS->setEnabled(true);
+            m_ui->checkProxyMisc->setEnabled(true);
+        }
     }
 }
 
@@ -1609,19 +1698,19 @@ void OptionsDialog::setLocale(const QString &localeStr)
     QString name;
     if (localeStr.startsWith(u"eo", Qt::CaseInsensitive))
     {
-        name = u"eo"_qs;
+        name = u"eo"_s;
     }
     else if (localeStr.startsWith(u"ltg", Qt::CaseInsensitive))
     {
-        name = u"ltg"_qs;
+        name = u"ltg"_s;
     }
     else
     {
         QLocale locale(localeStr);
         if (locale.language() == QLocale::Uzbek)
-            name = u"uz@Latn"_qs;
+            name = u"uz@Latn"_s;
         else if (locale.language() == QLocale::Azerbaijani)
-            name = u"az@latin"_qs;
+            name = u"az@latin"_s;
         else
             name = locale.name();
     }
@@ -1640,7 +1729,7 @@ void OptionsDialog::setLocale(const QString &localeStr)
     if (index < 0)
     {
         // Unrecognized, use US English
-        index = m_ui->comboI18n->findData(u"en"_qs, Qt::UserRole);
+        index = m_ui->comboI18n->findData(u"en"_s, Qt::UserRole);
         Q_ASSERT(index >= 0);
     }
     m_ui->comboI18n->setCurrentIndex(index);
@@ -1668,13 +1757,13 @@ void OptionsDialog::on_addWatchedFolderButton_clicked()
     if (dir.isEmpty())
         return;
 
-    auto dialog = new WatchedFolderOptionsDialog({}, this);
+    auto *dialog = new WatchedFolderOptionsDialog({}, this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(dialog, &QDialog::accepted, this, [this, dialog, dir, pref]()
     {
         try
         {
-            auto watchedFoldersModel = static_cast<WatchedFoldersModel *>(m_ui->scanFoldersView->model());
+            auto *watchedFoldersModel = static_cast<WatchedFoldersModel *>(m_ui->scanFoldersView->model());
             watchedFoldersModel->addFolder(dir, dialog->watchedFolderOptions());
 
             pref->setScanDirsLastPath(dir);
@@ -1722,8 +1811,8 @@ void OptionsDialog::editWatchedFolderOptions(const QModelIndex &index)
     if (!index.isValid())
         return;
 
-    auto watchedFoldersModel = static_cast<WatchedFoldersModel *>(m_ui->scanFoldersView->model());
-    auto dialog = new WatchedFolderOptionsDialog(watchedFoldersModel->folderOptions(index.row()), this);
+    auto *watchedFoldersModel = static_cast<WatchedFoldersModel *>(m_ui->scanFoldersView->model());
+    auto *dialog = new WatchedFolderOptionsDialog(watchedFoldersModel->folderOptions(index.row()), this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(dialog, &QDialog::accepted, this, [this, dialog, index, watchedFoldersModel]()
     {
@@ -1748,46 +1837,22 @@ Path OptionsDialog::getFilter() const
 #ifndef DISABLE_WEBUI
 void OptionsDialog::webUIHttpsCertChanged(const Path &path)
 {
-    const auto isCertFileValid = [&path]() -> bool
-    {
-        if (path.isEmpty())
-            return false;
-
-        QFile file {path.data()};
-        if (!file.open(QIODevice::ReadOnly))
-            return false;
-
-        if (!Utils::Net::isSSLCertificatesValid(file.read(Utils::Net::MAX_SSL_FILE_SIZE)))
-            return false;
-
-        return true;
-    };
+    const auto readResult = Utils::IO::readFile(path, Utils::Net::MAX_SSL_FILE_SIZE);
+    const bool isCertValid = Utils::Net::isSSLCertificatesValid(readResult.value_or(QByteArray()));
 
     m_ui->textWebUIHttpsCert->setSelectedPath(path);
     m_ui->lblSslCertStatus->setPixmap(UIThemeManager::instance()->getScaledPixmap(
-        (isCertFileValid() ? u"security-high"_qs : u"security-low"_qs), 24));
+        (isCertValid ? u"security-high"_s : u"security-low"_s), 24));
 }
 
 void OptionsDialog::webUIHttpsKeyChanged(const Path &path)
 {
-    const auto isKeyFileValid = [&path]() -> bool
-    {
-        if (path.isEmpty())
-            return false;
-
-        QFile file {path.data()};
-        if (!file.open(QIODevice::ReadOnly))
-            return false;
-
-        if (!Utils::Net::isSSLKeyValid(file.read(Utils::Net::MAX_SSL_FILE_SIZE)))
-            return false;
-
-        return true;
-    };
+    const auto readResult = Utils::IO::readFile(path, Utils::Net::MAX_SSL_FILE_SIZE);
+    const bool isKeyValid = Utils::Net::isSSLKeyValid(readResult.value_or(QByteArray()));
 
     m_ui->textWebUIHttpsKey->setSelectedPath(path);
     m_ui->lblSslKeyStatus->setPixmap(UIThemeManager::instance()->getScaledPixmap(
-        (isKeyFileValid() ? u"security-high"_qs : u"security-low"_qs), 24));
+        (isKeyValid ? u"security-high"_s : u"security-low"_s), 24));
 }
 
 bool OptionsDialog::isWebUiEnabled() const
@@ -1880,7 +1945,7 @@ bool OptionsDialog::schedTimesOk()
 
 void OptionsDialog::on_banListButton_clicked()
 {
-    auto dialog = new BanListOptionsDialog(this);
+    auto *dialog = new BanListOptionsDialog(this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(dialog, &QDialog::accepted, this, &OptionsDialog::enableApplyButton);
     dialog->open();
@@ -1888,7 +1953,7 @@ void OptionsDialog::on_banListButton_clicked()
 
 void OptionsDialog::on_IPSubnetWhitelistButton_clicked()
 {
-    auto dialog = new IPSubnetWhitelistOptionsDialog(this);
+    auto *dialog = new IPSubnetWhitelistOptionsDialog(this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(dialog, &QDialog::accepted, this, &OptionsDialog::enableApplyButton);
     dialog->open();

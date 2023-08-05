@@ -54,7 +54,7 @@ namespace BitTorrent
 
     public:
         TorrentInfo() = default;
-        TorrentInfo(const TorrentInfo &other);
+        TorrentInfo(const TorrentInfo &other) = default;
 
         explicit TorrentInfo(const lt::torrent_info &nativeInfo);
 
@@ -92,6 +92,8 @@ namespace BitTorrent
         // the given file extends (maybe partially).
         PieceRange filePieces(const Path &filePath) const;
         PieceRange filePieces(int fileIndex) const;
+
+        bool matchesInfoHash(const InfoHash &otherInfoHash) const;
 
         std::shared_ptr<lt::torrent_info> nativeInfo() const;
         QVector<lt::file_index_t> nativeIndexes() const;

@@ -240,7 +240,8 @@ const initializeWindows = function() {
             for (let i = 0; i < hashes.length; ++i) {
                 const hash = hashes[i];
                 const row = torrentsTable.rows[hash].full_data;
-                const origValues = row.ratio_limit + "|" + row.seeding_time_limit + "|" + row.max_ratio + "|" + row.max_seeding_time;
+                const origValues = row.ratio_limit + "|" + row.seeding_time_limit + "|" + row.inactive_seeding_time_limit + "|"
+                    + row.max_ratio + "|" + row.max_seeding_time + "|" + row.max_inactive_seeding_time;
 
                 // initialize value
                 if (shareRatio === null)
@@ -1004,12 +1005,12 @@ const initializeWindows = function() {
         return torrentsTable.selectedRowsIds().join("\n");
     };
 
-    exportTorrentFN = function() {
+    exportTorrentFN = async function() {
         const hashes = torrentsTable.selectedRowsIds();
         for (const hash of hashes) {
             const row = torrentsTable.rows.get(hash);
             if (!row)
-                return;
+                continue;
 
             const name = row.full_data.name;
             const url = new URI("api/v2/torrents/export");
@@ -1018,10 +1019,13 @@ const initializeWindows = function() {
             // download response to file
             const element = document.createElement("a");
             element.setAttribute("href", url);
-            element.setAttribute("download", name + ".torrent");
+            element.setAttribute("download", (name + ".torrent"));
             document.body.appendChild(element);
             element.click();
             document.body.removeChild(element);
+
+            // https://stackoverflow.com/questions/53560991/automatic-file-downloads-limited-to-10-files-on-chrome-browser
+            await window.qBittorrent.Misc.sleep(200);
         }
     };
 

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="zh">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="zh">
 <context>
     <name>AboutDlg</name>
     <message>
@@ -39,7 +37,7 @@
         <translation>创建子文件夹</translation>
     </message>
     <message>
-        <source>Don't create subfolder</source>
+        <source>Don&apos;t create subfolder</source>
         <translation>不创建子文件夹</translation>
     </message>
     <message>
@@ -56,7 +54,7 @@
     </message>
     <message>
         <source>Files checked</source>
-        <translation>已检查的文件</translation>
+        <translation>文件已被检查</translation>
     </message>
     <message>
         <source>Stop condition:</source>
@@ -65,6 +63,10 @@
     <message>
         <source>None</source>
         <translation>无</translation>
+    </message>
+    <message>
+        <source>Add to top of queue</source>
+        <translation>添加到队列顶部</translation>
     </message>
 </context>
 <context>
@@ -110,7 +112,11 @@
     </message>
     <message>
         <source>Remove torrents</source>
-        <translation>移除 torrents</translation>
+        <translation>移除 Torrent</translation>
+    </message>
+    <message>
+        <source>Add subcategory...</source>
+        <translation>添加子分类...</translation>
     </message>
 </context>
 <context>
@@ -568,10 +574,6 @@
         <translation>下载速度图标</translation>
     </message>
     <message>
-        <source>Connection status</source>
-        <translation>连接状态</translation>
-    </message>
-    <message>
         <source>Alternative speed limits: On</source>
         <translation>备用速度限制：开启</translation>
     </message>
@@ -605,11 +607,11 @@
     </message>
     <message>
         <source>Would you like to resume all torrents?</source>
-        <translation>你要继续下载所有的种子吗？</translation>
+        <translation>您要继续所有的 Torrent 吗？</translation>
     </message>
     <message>
         <source>Would you like to pause all torrents?</source>
-        <translation>你要暂停所有的种子吗？</translation>
+        <translation>您要暂停所有的 Torrent 吗？</translation>
     </message>
     <message>
         <source>Execution Log</source>
@@ -760,7 +762,7 @@
     </message>
     <message>
         <source>Use UPnP / NAT-PMP port forwarding from my router</source>
-        <translation>使用我的路由器的 UPnP / NAT-PMP 功能来转发端口</translation>
+        <translation>使用我的路由器的 UPnP / NAT-PMP 端口转发</translation>
     </message>
     <message>
         <source>Connections Limits</source>
@@ -791,10 +793,6 @@
         <translation>类型：</translation>
     </message>
     <message>
-        <source>(None)</source>
-        <translation type="vanished">(无)</translation>
-    </message>
-    <message>
         <source>SOCKS4</source>
         <translation>SOCKS4</translation>
     </message>
@@ -817,10 +815,6 @@
     <message>
         <source>Use proxy for peer connections</source>
         <translation>使用代理服务器进行用户连接</translation>
-    </message>
-    <message>
-        <source>Use proxy only for torrents</source>
-        <translation type="vanished">只对 torrent 使用代理</translation>
     </message>
     <message>
         <source>Filter path (.dat, .p2p, .p2b):</source>
@@ -997,8 +991,8 @@
         <translation>%T：当前 tracker</translation>
     </message>
     <message>
-        <source>Tip: Encapsulate parameter with quotation marks to avoid text being cut off at whitespace (e.g., "%N")</source>
-        <translation>提示：使用引号将参数扩起以防止文本被空白符分割（例如："%N"）</translation>
+        <source>Tip: Encapsulate parameter with quotation marks to avoid text being cut off at whitespace (e.g., &quot;%N&quot;)</source>
+        <translation>提示：使用引号将参数扩起以防止文本被空白符分割（例如：&quot;%N&quot;）</translation>
     </message>
     <message>
         <source>The Web UI username must be at least 3 characters long.</source>
@@ -1130,7 +1124,7 @@
     </message>
     <message>
         <source>Info: The password is saved unencrypted</source>
-        <translation>提示：储存的密码未被加密</translation>
+        <translation>提示：密码未加密</translation>
     </message>
     <message>
         <source>μTP-TCP mixed mode algorithm:</source>
@@ -1217,10 +1211,6 @@
         <translation>libtorrent 相关</translation>
     </message>
     <message>
-        <source>Outgoing ports (Min) [0: Disabled]:</source>
-        <translation>传出端口 (下限) [0: 禁用]:</translation>
-    </message>
-    <message>
         <source>Recheck torrents on completion:</source>
         <translation>完成后重新校验 Torrent:</translation>
     </message>
@@ -1239,10 +1229,6 @@
     <message>
         <source>Remove torrent</source>
         <translation>删除 torrent</translation>
-    </message>
-    <message>
-        <source>Outgoing ports (Max) [0: Disabled]:</source>
-        <translation>传出端口 (上限) [0: 禁用]:</translation>
     </message>
     <message>
         <source>Asynchronous I/O threads:</source>
@@ -1310,7 +1296,7 @@
     </message>
     <message>
         <source>Session timeout:</source>
-        <translation>会话超时:</translation>
+        <translation>会话超时：</translation>
     </message>
     <message>
         <source>Resolve peer countries:</source>
@@ -1321,28 +1307,20 @@
         <translation>禁止：</translation>
     </message>
     <message>
-        <source>Stop tracker timeout:</source>
-        <translation>停止tracker超时：</translation>
-    </message>
-    <message>
         <source>Ban client after consecutive failures:</source>
         <translation>连续失败后禁止客户端：</translation>
     </message>
     <message>
         <source>Enable cookie Secure flag (requires HTTPS)</source>
-        <translation>启用cookie安全标志（需要HTTPS）</translation>
-    </message>
-    <message>
-        <source>UPnP lease duration [0: Permanent lease]:</source>
-        <translation>UPnP 租期 [0：永久 ]：</translation>
+        <translation>启用 cookie 安全标志（需要 HTTPS）</translation>
     </message>
     <message>
         <source>Header: value pairs, one per line</source>
-        <translation>在此输入HTTP头字段，每行一个</translation>
+        <translation>Header: value 值对，每行一个</translation>
     </message>
     <message>
         <source>Add custom HTTP headers</source>
-        <translation>添加自定义HTTP头字段</translation>
+        <translation>添加自定义 HTTP headers</translation>
     </message>
     <message>
         <source>Filters:</source>
@@ -1351,14 +1329,6 @@
     <message>
         <source>Enable fetching RSS feeds</source>
         <translation>启用获取 RSS 订阅</translation>
-    </message>
-    <message>
-        <source>Hashing threads (requires libtorrent &gt;= 2.0):</source>
-        <translation>散列线程（需要libtorrent&gt; = 2.0）：</translation>
-    </message>
-    <message>
-        <source>Coalesce reads &amp; writes (requires libtorrent &lt; 2.0):</source>
-        <translation>合并读写（需要libtorrent&lt;2.0）：</translation>
     </message>
     <message>
         <source>Peer turnover threshold percentage:</source>
@@ -1402,7 +1372,7 @@
     </message>
     <message>
         <source> min</source>
-        <translation>分钟</translation>
+        <translation> 分钟</translation>
     </message>
     <message>
         <source>Peer turnover disconnect interval:</source>
@@ -1425,20 +1395,12 @@
         <translation>RSS 智能剧集过滤器</translation>
     </message>
     <message>
-        <source>Disk cache (requires libtorrent &lt; 2.0):</source>
-        <translation>磁盘缓存（需要 libtorrent  &lt; 2.0）：</translation>
-    </message>
-    <message>
-        <source>Disk cache expiry interval (requires libtorrent &lt; 2.0):</source>
-        <translation>磁盘缓存过期时间间隔（要求 libtorrent &lt; 2.0）：</translation>
-    </message>
-    <message>
         <source>Validate HTTPS tracker certificate:</source>
         <translation>验证 HTTPS tracker 证书：</translation>
     </message>
     <message>
         <source>Peer connection protocol:</source>
-        <translation>下载连接协议：</translation>
+        <translation>Peer 连接协议：</translation>
     </message>
     <message>
         <source>Torrent content layout:</source>
@@ -1453,7 +1415,7 @@
         <translation>原始</translation>
     </message>
     <message>
-        <source>Don't create subfolder</source>
+        <source>Don&apos;t create subfolder</source>
         <translation>不创建子文件夹</translation>
     </message>
     <message>
@@ -1518,7 +1480,7 @@
     </message>
     <message>
         <source>Max active checking torrents:</source>
-        <translation>最大活跃检查种子数：</translation>
+        <translation>最大活跃检查 Torrent 数：</translation>
     </message>
     <message>
         <source>Memory mapped files</source>
@@ -1535,14 +1497,6 @@
     <message>
         <source>This option is less effective on Linux</source>
         <translation>这个选项在 Linux 上没那么有效</translation>
-    </message>
-    <message>
-        <source>Disk IO type (libtorrent &gt;= 2.0; requires restart):</source>
-        <translation>磁盘 IO 类型（libtorrent &gt;= 2.0；需要重启）：</translation>
-    </message>
-    <message>
-        <source>Write-through (requires libtorrent &gt;= 2.0.6)</source>
-        <translation>连续写入（需要  libtorrent &gt;= 2.0.6）</translation>
     </message>
     <message>
         <source>It controls the internal state update interval which in turn will affect UI updates</source>
@@ -1577,10 +1531,6 @@
         <translation>刷新间隔</translation>
     </message>
     <message>
-        <source>Physical memory (RAM) usage limit (applied if libtorrent &gt;= 2.0):</source>
-        <translation>物理内存使用上限（仅 libtorrent &gt;= 2.0 时应用）</translation>
-    </message>
-    <message>
         <source>ms</source>
         <translation>毫秒</translation>
     </message>
@@ -1601,12 +1551,12 @@
 In order to defend against DNS rebinding attack,
 you should put in domain names used by WebUI server.
 
-Use ';' to split multiple entries. Can use wildcard '*'.</source>
+Use &apos;;&apos; to split multiple entries. Can use wildcard &apos;*&apos;.</source>
         <translation>白名单用于过滤 HTTP 头的 Host 参数。
 为了预防 DNS 反向绑定攻击，
 您应当指定供 Web UI 使用的域名。
 
-使用 ';' 区分不同的输入。可以使用通配符 '*'。</translation>
+使用 &apos;;&apos; 区分不同的输入。可以使用通配符 &apos;*&apos;。</translation>
     </message>
     <message>
         <source>Run external program on torrent added</source>
@@ -1617,8 +1567,8 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
         <translation>HTTPS 证书不能为空</translation>
     </message>
     <message>
-        <source>Specify reverse proxy IPs (or subnets, e.g. 0.0.0.0/24) in order to use forwarded client address (X-Forwarded-For header). Use ';' to split multiple entries.</source>
-        <translation>指定反向代理 IP（或子网，如 0.0.0.0/24）以使用转发的客户端地址（X-Forwarded-For 标头)。使用 ';' 符号分割多个条目。</translation>
+        <source>Specify reverse proxy IPs (or subnets, e.g. 0.0.0.0/24) in order to use forwarded client address (X-Forwarded-For header). Use &apos;;&apos; to split multiple entries.</source>
+        <translation>指定反向代理 IP（或子网，如 0.0.0.0/24）以使用转发的客户端地址（X-Forwarded-For 标头）。使用 “;” 符号分割多个条目。</translation>
     </message>
     <message>
         <source>HTTPS key should not be empty</source>
@@ -1630,7 +1580,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Files checked</source>
-        <translation>选中的文件</translation>
+        <translation>文件已被检查</translation>
     </message>
     <message>
         <source>Enable port forwarding for embedded tracker:</source>
@@ -1650,7 +1600,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Torrent stop condition:</source>
-        <translation>种子停止条件：</translation>
+        <translation>Torrent 停止条件：</translation>
     </message>
     <message>
         <source>None</source>
@@ -1658,11 +1608,11 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Example: 172.17.32.0/24, fdff:ffff:c8::/40</source>
-        <translation>示例：172.17.32.0/24, fdff:ffff:c8::/40</translation>
+        <translation>示例：172.17.32.0/24，fdff:ffff:c8::/40</translation>
     </message>
     <message>
         <source>SQLite database (experimental)</source>
-        <translation>SQLite数据库（实验性功能）</translation>
+        <translation>SQLite 数据库（实验性功能）</translation>
     </message>
     <message>
         <source>Resume data storage type (requires restart):</source>
@@ -1674,51 +1624,111 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Backup the log file after:</source>
-        <translation type="unfinished" />
+        <translation>当大于指定大小时备份日志文件：</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished" />
+        <translation>天</translation>
     </message>
     <message>
         <source>Log file</source>
-        <translation type="unfinished" />
+        <translation>日志文件</translation>
     </message>
     <message>
         <source>Behavior</source>
-        <translation type="unfinished" />
+        <translation>行为</translation>
     </message>
     <message>
         <source>Delete backup logs older than:</source>
-        <translation type="unfinished" />
+        <translation>删除早于指定时间的备份日志文件：</translation>
     </message>
     <message>
         <source>Use proxy for BitTorrent purposes</source>
-        <translation type="unfinished" />
+        <translation>对 BitTorrent 目的使用代理</translation>
     </message>
     <message>
         <source>years</source>
-        <translation type="unfinished" />
+        <translation>年</translation>
     </message>
     <message>
         <source>Save path:</source>
-        <translation type="unfinished" />
+        <translation>保存路径：</translation>
     </message>
     <message>
         <source>months</source>
-        <translation type="unfinished" />
+        <translation>月</translation>
     </message>
     <message>
         <source>Remember Multi-Rename settings</source>
-        <translation type="unfinished" />
+        <translation>记住多重命名设置</translation>
     </message>
     <message>
         <source>Use proxy for general purposes</source>
-        <translation type="unfinished" />
+        <translation>对常规目的使用代理</translation>
     </message>
     <message>
         <source>Use proxy for RSS purposes</source>
-        <translation type="unfinished" />
+        <translation>对 RSS 目的使用代理</translation>
+    </message>
+    <message>
+        <source>Disk cache expiry interval (requires libtorrent &amp;lt; 2.0):</source>
+        <translation>磁盘缓存过期间隔（需要 libtorrent &amp;lt; 2.0）：</translation>
+    </message>
+    <message>
+        <source>Physical memory (RAM) usage limit (applied if libtorrent &amp;gt;= 2.0):</source>
+        <translation>物理内存（RAM）用量上限（仅适用于 libtorrent &amp;gt;= 2.0）：</translation>
+    </message>
+    <message>
+        <source>Disk cache (requires libtorrent &amp;lt; 2.0):</source>
+        <translation>磁盘缓存（需要  libtorrent &amp;lt; 2.0）：</translation>
+    </message>
+    <message>
+        <source>Socket send buffer size [0: system default]:</source>
+        <translation>套接字发送缓存大小 [0: 系统默认值]：</translation>
+    </message>
+    <message>
+        <source>Coalesce reads &amp;amp; writes (requires libtorrent &amp;lt; 2.0):</source>
+        <translation>合并读取 &amp;amp; 写入（需要 libtorrent &amp;lt; 2.0）：</translation>
+    </message>
+    <message>
+        <source>Outgoing ports (Max) [0: disabled]:</source>
+        <translation>传出端口（上限）[0: 禁用]：</translation>
+    </message>
+    <message>
+        <source>Socket receive buffer size [0: system default]:</source>
+        <translation>套接字接收缓存大小 [0: 系统默认值]：</translation>
+    </message>
+    <message>
+        <source>Use Subcategories</source>
+        <translation>启用子分类：</translation>
+    </message>
+    <message>
+        <source>Disk IO type (libtorrent &amp;gt;= 2.0; requires restart):</source>
+        <translation>磁盘 IO 类型（libtorrent &amp;gt;=2.0；需要重启）：</translation>
+    </message>
+    <message>
+        <source>Add to top of queue</source>
+        <translation>添加到队列顶部</translation>
+    </message>
+    <message>
+        <source>Write-through (requires libtorrent &amp;gt;= 2.0.6)</source>
+        <translation>连续写入（需要 libtorrent &amp;gt;= 2.0.6）</translation>
+    </message>
+    <message>
+        <source>Stop tracker timeout [0: disabled]:</source>
+        <translation>停止 tracker 超时 [0: 禁用]：</translation>
+    </message>
+    <message>
+        <source>Outgoing ports (Min) [0: disabled]:</source>
+        <translation>传出端口 (下限) [0: 禁用]:</translation>
+    </message>
+    <message>
+        <source>Hashing threads (requires libtorrent &amp;gt;= 2.0):</source>
+        <translation>散列线程（需要libtorrent &amp;gt;=2.0）：</translation>
+    </message>
+    <message>
+        <source>UPnP lease duration [0: permanent lease]:</source>
+        <translation>UPnP 租期 [0：永久 ]：</translation>
     </message>
 </context>
 <context>
@@ -1801,7 +1811,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Peer ID Client</source>
-        <translation>Peer ID 客戶端</translation>
+        <translation>Peer ID 客户端</translation>
     </message>
 </context>
 <context>
@@ -2026,63 +2036,63 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Use regular expressions</source>
-        <translation type="unfinished" />
+        <translation>使用正则表达式</translation>
     </message>
     <message>
         <source>Filename</source>
-        <translation type="unfinished" />
+        <translation>文件名</translation>
     </message>
     <message>
         <source>Filename + Extension</source>
-        <translation type="unfinished" />
+        <translation>文件名+扩展名</translation>
     </message>
     <message>
         <source>Enumerate Files</source>
-        <translation type="unfinished" />
+        <translation>枚举文件</translation>
     </message>
     <message>
         <source>Rename failed: file or folder already exists</source>
-        <translation type="unfinished" />
+        <translation>重命名失败：文件或文件夹已存在</translation>
     </message>
     <message>
         <source>Match all occurences</source>
-        <translation type="unfinished" />
+        <translation>匹配所有出现</translation>
     </message>
     <message>
         <source>Toggle Selection</source>
-        <translation type="unfinished" />
+        <translation>切换所选</translation>
     </message>
     <message>
         <source>Replacement Input</source>
-        <translation type="unfinished" />
+        <translation>替换输入</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation type="unfinished" />
+        <translation>替换</translation>
     </message>
     <message>
         <source>Extension</source>
-        <translation type="unfinished" />
+        <translation>扩展名</translation>
     </message>
     <message>
         <source>Replace All</source>
-        <translation type="unfinished" />
+        <translation>替换全部</translation>
     </message>
     <message>
         <source>Include files</source>
-        <translation type="unfinished" />
+        <translation>包含文件</translation>
     </message>
     <message>
         <source>Include folders</source>
-        <translation type="unfinished" />
+        <translation>包含文件夹</translation>
     </message>
     <message>
         <source>Search Files</source>
-        <translation type="unfinished" />
+        <translation>搜索文件</translation>
     </message>
     <message>
         <source>Case sensitive</source>
-        <translation type="unfinished" />
+        <translation>区分大小写</translation>
     </message>
 </context>
 <context>
@@ -2553,19 +2563,19 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Times Downloaded</source>
-        <translation>下载时间</translation>
+        <translation>下载次数</translation>
     </message>
     <message>
         <source>Add trackers...</source>
-        <translation>添加 trackers...</translation>
+        <translation>添加 Tracker...</translation>
     </message>
     <message>
         <source>Renamed</source>
-        <translation type="unfinished" />
+        <translation>已重命名</translation>
     </message>
     <message>
         <source>Original</source>
-        <translation type="unfinished" />
+        <translation>原始</translation>
     </message>
 </context>
 <context>
@@ -2576,7 +2586,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Add trackers</source>
-        <translation>添加 trackers</translation>
+        <translation>添加 Tracker</translation>
     </message>
 </context>
 <context>
@@ -2672,6 +2682,10 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     <message>
         <source>Trackers</source>
         <translation>Tracker</translation>
+    </message>
+    <message>
+        <source>Collapse/expand</source>
+        <translation>折叠/展开</translation>
     </message>
 </context>
 <context>
@@ -2807,7 +2821,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Comma-separated tags:</source>
-        <translation>逗号分隔的标签：</translation>
+        <translation>标签（以逗号分隔）：</translation>
     </message>
     <message>
         <source>Add Tags</source>
@@ -2859,15 +2873,15 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Remove</source>
-        <translation>移除</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <source>Rename Files...</source>
-        <translation type="unfinished" />
+        <translation>重命名文件...</translation>
     </message>
     <message>
         <source>Renaming</source>
-        <translation type="unfinished" />
+        <translation>重命名</translation>
     </message>
 </context>
 <context>
@@ -2904,11 +2918,11 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     <name>confirmDeletionDlg</name>
     <message>
         <source>Also permanently delete the files</source>
-        <translation>并永久性删除这些文件</translation>
+        <translation>并永久删除这些文件</translation>
     </message>
     <message>
         <source>Remove torrent(s)</source>
-        <translation>移除一个或多个 torrent</translation>
+        <translation>移除 Torrent</translation>
     </message>
 </context>
 <context>
@@ -3103,11 +3117,11 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
         <translation>显示</translation>
     </message>
     <message>
-        <source>Click the "Search plugins..." button at the bottom right of the window to install some.</source>
+        <source>Click the &quot;Search plugins...&quot; button at the bottom right of the window to install some.</source>
         <translation>单击窗口底部右侧的“搜索插件...“按钮安装一些</translation>
     </message>
     <message>
-        <source>There aren't any search plugins installed.</source>
+        <source>There aren&apos;t any search plugins installed.</source>
         <translation>未安装任何搜索插件</translation>
     </message>
 </context>
@@ -3138,7 +3152,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
         <translation>启用</translation>
     </message>
     <message>
-        <source>Warning: Be sure to comply with your country's copyright laws when downloading torrents from any of these search engines.</source>
+        <source>Warning: Be sure to comply with your country&apos;s copyright laws when downloading torrents from any of these search engines.</source>
         <translation>警告：在下载来自这些搜索引擎的 torrent 时，请确认它符合您所在国家的版权法。</translation>
     </message>
     <message>
@@ -3193,11 +3207,11 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Yes</source>
-        <translation>确定</translation>
+        <translation>是</translation>
     </message>
     <message>
         <source>No</source>
-        <translation>取消</translation>
+        <translation>否</translation>
     </message>
 </context>
 <context>
@@ -3259,7 +3273,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Remove torrents</source>
-        <translation>移除多个 torrent</translation>
+        <translation>移除 Torrent</translation>
     </message>
 </context>
 <context>
@@ -3414,7 +3428,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Renaming)</source>
-        <translation type="unfinished" />
+        <translation>正在重命名）</translation>
     </message>
 </context>
 <context>
@@ -3528,7 +3542,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>* to match zero or more of any characters</source>
-        <translation>* ——匹配 0 个或多个任意字符</translation>
+        <translation>* —— 匹配 0 个或多个任意字符</translation>
     </message>
     <message>
         <source> will match all articles.</source>
@@ -3564,7 +3578,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>? to match any single character</source>
-        <translation>? ——匹配任意单个字符</translation>
+        <translation>? —— 匹配任意单个字符</translation>
     </message>
     <message>
         <source>Matches articles based on episode filter.</source>
@@ -3580,7 +3594,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>| is used as OR operator</source>
-        <translation>| —— "或" 运算符</translation>
+        <translation>| —— &quot;或&quot; 运算符</translation>
     </message>
     <message>
         <source>Clear downloaded episodes</source>
@@ -3588,7 +3602,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Whitespaces count as AND operators (all words, any order)</source>
-        <translation>空格 —— "与" 运算符 (所有关键词，任意顺序)</translation>
+        <translation>空格 —— &quot;与&quot; 运算符 (所有关键词，任意顺序)</translation>
     </message>
     <message>
         <source>An expression with an empty %1 clause (e.g. %2)</source>
@@ -3620,7 +3634,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Must Not Contain:</source>
-        <translation>不可包含：</translation>
+        <translation>必须不含：</translation>
     </message>
     <message>
         <source>Single number: &lt;b&gt;1x25;&lt;/b&gt; matches episode 25 of season one</source>
@@ -3724,7 +3738,7 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     </message>
     <message>
         <source>Ignore Subsequent Matches for (0 to Disable)</source>
-        <translation>忽略指定时间后的匹配项 (0 = 禁用)</translation>
+        <translation>忽略指定时间后的匹配项（0 = 禁用）</translation>
     </message>
     <message>
         <source>Rename rule...</source>
@@ -3741,8 +3755,8 @@ Use ';' to split multiple entries. Can use wildcard '*'.</source>
     <message>
         <source>Smart Episode Filter will check the episode number to prevent downloading of duplicates.
 Supports the formats: S01E01, 1x1, 2017.12.31 and 31.12.2017 (Date formats also support - as a separator)</source>
-        <translation>智能剧集过滤器会检查集数以避免重复下载。
-支持格式：S01E01，1x1，2017.12.31，31.12.2017 (日期分隔符也可用 "-" 符号)</translation>
+        <translation>智能剧集过滤器会检查剧集编号以避免重复下载。
+支持格式：S01E01，1x1，2017.12.31，31.12.2017（日期格式也支持“-”分隔符）</translation>
     </message>
     <message>
         <source>Torrent content layout:</source>
@@ -3757,7 +3771,7 @@ Supports the formats: S01E01, 1x1, 2017.12.31 and 31.12.2017 (Date formats also 
         <translation>原始</translation>
     </message>
     <message>
-        <source>Don't create subfolder</source>
+        <source>Don&apos;t create subfolder</source>
         <translation>不创建子文件夹</translation>
     </message>
 </context>
@@ -3765,7 +3779,7 @@ Supports the formats: S01E01, 1x1, 2017.12.31 and 31.12.2017 (Date formats also 
     <name>TrackerFiltersList</name>
     <message>
         <source>Resume torrents</source>
-        <translation>继续 torrent</translation>
+        <translation>继续 Torrent</translation>
     </message>
     <message>
         <source>All (%1)</source>
@@ -3773,15 +3787,15 @@ Supports the formats: S01E01, 1x1, 2017.12.31 and 31.12.2017 (Date formats also 
     </message>
     <message>
         <source>Trackerless (%1)</source>
-        <translation>缺少 tracker (%1)</translation>
+        <translation>缺少 Tracker (%1)</translation>
     </message>
     <message>
         <source>Pause torrents</source>
-        <translation>暂停 torrent</translation>
+        <translation>暂停 Torrent</translation>
     </message>
     <message>
         <source>Remove torrents</source>
-        <translation>移除多个 torrent</translation>
+        <translation>移除 Torrent</translation>
     </message>
 </context>
 <context>
@@ -3799,7 +3813,7 @@ Supports the formats: S01E01, 1x1, 2017.12.31 and 31.12.2017 (Date formats also 
     <name>ExecutionLogWidget</name>
     <message>
         <source>General</source>
-        <translation>常规</translation>
+        <translation>普通</translation>
     </message>
     <message>
         <source>Blocked</source>
@@ -3843,7 +3857,7 @@ Supports the formats: S01E01, 1x1, 2017.12.31 and 31.12.2017 (Date formats also 
     </message>
     <message>
         <source>Information Messages</source>
-        <translation>通知信息</translation>
+        <translation>通知消息</translation>
     </message>
     <message>
         <source>Warning Messages</source>
@@ -3855,7 +3869,7 @@ Supports the formats: S01E01, 1x1, 2017.12.31 and 31.12.2017 (Date formats also 
     </message>
     <message>
         <source>Blocked IPs</source>
-        <translation>被拦截的 IP</translation>
+        <translation>被封禁的 IP</translation>
     </message>
     <message>
         <source>out of</source>
@@ -3875,7 +3889,7 @@ Supports the formats: S01E01, 1x1, 2017.12.31 and 31.12.2017 (Date formats also 
     </message>
     <message>
         <source>Message</source>
-        <translation>信息</translation>
+        <translation>消息</translation>
     </message>
     <message>
         <source>Log Levels:</source>
@@ -3907,11 +3921,11 @@ Supports the formats: S01E01, 1x1, 2017.12.31 and 31.12.2017 (Date formats also 
     </message>
     <message>
         <source>Critical Messages</source>
-        <translation>关键信息</translation>
+        <translation>严重信息</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation>一般</translation>
+        <translation>正常</translation>
     </message>
     <message>
         <source>items</source>

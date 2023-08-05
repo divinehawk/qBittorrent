@@ -68,6 +68,13 @@ namespace BitTorrent
         Overwrite
     };
 
+    enum class MoveStorageContext
+    {
+        AdjustCurrentLocation,
+        ChangeSavePath,
+        ChangeDownloadPath
+    };
+
     enum class MaintenanceJob
     {
         None,
@@ -77,7 +84,7 @@ namespace BitTorrent
     struct FileErrorInfo
     {
         lt::error_code error;
-        lt::operation_t operation;
+        lt::operation_t operation = lt::operation_t::unknown;
     };
 
     class TorrentImpl final : public Torrent
@@ -131,6 +138,7 @@ namespace BitTorrent
         QDateTime addedTime() const override;
         qreal ratioLimit() const override;
         int seedingTimeLimit() const override;
+        int inactiveSeedingTimeLimit() const override;
 
         Path filePath(int index) const override;
         Path actualFilePath(int index) const override;
@@ -191,6 +199,7 @@ namespace BitTorrent
         qreal distributedCopies() const override;
         qreal maxRatio() const override;
         int maxSeedingTime() const override;
+        int maxInactiveSeedingTime() const override;
         qreal realRatio() const override;
         int uploadPayloadRate() const override;
         int downloadPayloadRate() const override;
@@ -213,6 +222,7 @@ namespace BitTorrent
         void prioritizeFiles(const QVector<DownloadPriority> &priorities) override;
         void setRatioLimit(qreal limit) override;
         void setSeedingTimeLimit(int limit) override;
+        void setInactiveSeedingTimeLimit(int limit) override;
         void setUploadLimit(int limit) override;
         void setDownloadLimit(int limit) override;
         void setSuperSeeding(bool enable) override;
@@ -252,7 +262,7 @@ namespace BitTorrent
         void handleCategoryOptionsChanged();
         void handleAppendExtensionToggled();
         void saveResumeData(lt::resume_data_flags_t flags = {});
-        void handleMoveStorageJobFinished(const Path &path, bool hasOutstandingJob);
+        void handleMoveStorageJobFinished(const Path &path, MoveStorageContext context, bool hasOutstandingJob);
         void fileSearchFinished(const Path &savePath, const PathList &fileNames);
         TrackerEntry updateTrackerEntry(const lt::announce_entry &announceEntry, const QMap<TrackerEntry::Endpoint, int> &updateInfo);
 
@@ -289,7 +299,7 @@ namespace BitTorrent
         Path wantedActualPath(int index, const Path &path) const;
         void adjustStorageLocation();
         void doRenameFile(int index, const Path &path);
-        void moveStorage(const Path &newPath, MoveStorageMode mode);
+        void moveStorage(const Path &newPath, MoveStorageContext context);
         void manageIncompleteFiles();
         void applyFirstLastPiecePriority(bool enabled);
 
@@ -338,6 +348,7 @@ namespace BitTorrent
         TagSet m_tags;
         qreal m_ratioLimit;
         int m_seedingTimeLimit;
+        int m_inactiveSeedingTimeLimit;
         TorrentOperatingMode m_operatingMode;
         TorrentContentLayout m_contentLayout;
         bool m_hasFinishedStatus;

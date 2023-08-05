@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt and libtorrent.
- * Copyright (C) 2020  Vladimir Golovnev <glassez@yandex.ru>
+ * Copyright (C) 2023  Vladimir Golovnev <glassez@yandex.ru>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,26 +26,29 @@
  * exception statement from your version.
  */
 
-#pragma once
+#include <QTest>
 
-#include <QtGlobal>
+#include "base/global.h"
+#include "base/utils/bytearray.h"
 
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-#include <functional>
-
-#include <libtorrent/units.hpp>
-
-#include <QHash>
-
-namespace libtorrent
+class TestUtilsByteArray final : public QObject
 {
-    namespace aux
+    Q_OBJECT
+    Q_DISABLE_COPY_MOVE(TestUtilsByteArray)
+
+public:
+    TestUtilsByteArray() = default;
+
+private slots:
+    void testBase32Encode() const
     {
-        template <typename T, typename Tag>
-        uint qHash(const strong_typedef<T, Tag> &key, const uint seed = 0)
-        {
-            return ::qHash((std::hash<strong_typedef<T, Tag>> {})(key), seed);
-        }
+        QCOMPARE(Utils::ByteArray::toBase32(""), "");
+        QCOMPARE(Utils::ByteArray::toBase32("0123456789"), "GAYTEMZUGU3DOOBZ");
+        QCOMPARE(Utils::ByteArray::toBase32("ABCDE"), "IFBEGRCF");
+        QCOMPARE(Utils::ByteArray::toBase32("0000000000"), "GAYDAMBQGAYDAMBQ");
+        QCOMPARE(Utils::ByteArray::toBase32("1"), "GE======");
     }
-}
-#endif
+};
+
+QTEST_APPLESS_MAIN(TestUtilsByteArray)
+#include "testutilsbytearray.moc"

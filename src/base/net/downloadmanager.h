@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt and libtorrent.
- * Copyright (C) 2015, 2018  Vladimir Golovnev <glassez@yandex.ru>
+ * Copyright (C) 2015-2023  Vladimir Golovnev <glassez@yandex.ru>
  * Copyright (C) 2006  Christophe Dumez <chris@qbittorrent.org>
  *
  * This program is free software; you can redistribute it and/or
@@ -54,11 +54,7 @@ namespace Net
         static ServiceID fromURL(const QUrl &url);
     };
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     std::size_t qHash(const ServiceID &serviceID, std::size_t seed = 0);
-#else
-    uint qHash(const ServiceID &serviceID, uint seed = 0);
-#endif
     bool operator==(const ServiceID &lhs, const ServiceID &rhs);
 
     enum class DownloadStatus
@@ -103,11 +99,11 @@ namespace Net
     struct DownloadResult
     {
         QString url;
-        DownloadStatus status;
+        DownloadStatus status = DownloadStatus::Failed;
         QString errorString;
         QByteArray data;
         Path filePath;
-        QString magnet;
+        QString magnetURI;
     };
 
     class DownloadHandler : public QObject
@@ -126,7 +122,7 @@ namespace Net
 
     class DownloadHandlerImpl;
 
-    class DownloadManager : public QObject
+    class DownloadManager final : public QObject
     {
         Q_OBJECT
         Q_DISABLE_COPY_MOVE(DownloadManager)

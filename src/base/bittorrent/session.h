@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt and libtorrent.
- * Copyright (C) 2015-2022  Vladimir Golovnev <glassez@yandex.ru>
+ * Copyright (C) 2015-2023  Vladimir Golovnev <glassez@yandex.ru>
  * Copyright (C) 2006  Christophe Dumez <chris@qbittorrent.org>
  *
  * This program is free software; you can redistribute it and/or
@@ -58,8 +58,8 @@ enum DeleteOption
 namespace BitTorrent
 {
     class InfoHash;
-    class MagnetUri;
     class Torrent;
+    class TorrentDescriptor;
     class TorrentID;
     class TorrentInfo;
     struct CacheStatus;
@@ -170,6 +170,9 @@ namespace BitTorrent
         virtual bool useCategoryPathsInManualMode() const = 0;
         virtual void setUseCategoryPathsInManualMode(bool value) = 0;
 
+        virtual Path suggestedSavePath(const QString &categoryName, std::optional<bool> useAutoTMM) const = 0;
+        virtual Path suggestedDownloadPath(const QString &categoryName, std::optional<bool> useAutoTMM) const = 0;
+
         static bool isValidTag(const QString &tag);
         virtual QSet<QString> tags() const = 0;
         virtual bool hasTag(const QString &tag) const = 0;
@@ -200,6 +203,8 @@ namespace BitTorrent
         virtual void setGlobalMaxRatio(qreal ratio) = 0;
         virtual int globalMaxSeedingMinutes() const = 0;
         virtual void setGlobalMaxSeedingMinutes(int minutes) = 0;
+        virtual int globalMaxInactiveSeedingMinutes() const = 0;
+        virtual void setGlobalMaxInactiveSeedingMinutes(int minutes) = 0;
         virtual bool isDHTEnabled() const = 0;
         virtual void setDHTEnabled(bool enabled) = 0;
         virtual bool isLSDEnabled() const = 0;
@@ -268,6 +273,14 @@ namespace BitTorrent
         virtual void setI2PPort(int port) = 0;
         virtual bool I2PMixedMode() const = 0;
         virtual void setI2PMixedMode(bool enabled) = 0;
+        virtual int I2PInboundQuantity() const = 0;
+        virtual void setI2PInboundQuantity(int value) = 0;
+        virtual int I2POutboundQuantity() const = 0;
+        virtual void setI2POutboundQuantity(int value) = 0;
+        virtual int I2PInboundLength() const = 0;
+        virtual void setI2PInboundLength(int value) = 0;
+        virtual int I2POutboundLength() const = 0;
+        virtual void setI2POutboundLength(int value) = 0;
         virtual bool isProxyPeerConnectionsEnabled() const = 0;
         virtual void setProxyPeerConnectionsEnabled(bool enabled) = 0;
         virtual ChokingAlgorithm chokingAlgorithm() const = 0;
@@ -400,7 +413,7 @@ namespace BitTorrent
         virtual bool isTrackerFilteringEnabled() const = 0;
         virtual void setTrackerFilteringEnabled(bool enabled) = 0;
         virtual bool isExcludedFileNamesEnabled() const = 0;
-        virtual void setExcludedFileNamesEnabled(const bool enabled) = 0;
+        virtual void setExcludedFileNamesEnabled(bool enabled) = 0;
         virtual QStringList excludedFileNames() const = 0;
         virtual void setExcludedFileNames(const QStringList &newList) = 0;
         virtual bool isFilenameExcluded(const QString &fileName) const = 0;
@@ -408,6 +421,8 @@ namespace BitTorrent
         virtual void setBannedIPs(const QStringList &newList) = 0;
         virtual ResumeDataStorageType resumeDataStorageType() const = 0;
         virtual void setResumeDataStorageType(ResumeDataStorageType type) = 0;
+        virtual bool isMergeTrackersEnabled() const = 0;
+        virtual void setMergeTrackersEnabled(bool enabled) = 0;
 
         virtual bool isRestored() const = 0;
 
@@ -426,10 +441,9 @@ namespace BitTorrent
 
         virtual bool isKnownTorrent(const InfoHash &infoHash) const = 0;
         virtual bool addTorrent(const QString &source, const AddTorrentParams &params = {}) = 0;
-        virtual bool addTorrent(const MagnetUri &magnetUri, const AddTorrentParams &params = {}) = 0;
-        virtual bool addTorrent(const TorrentInfo &torrentInfo, const AddTorrentParams &params = {}) = 0;
+        virtual bool addTorrent(const TorrentDescriptor &torrentDescr, const AddTorrentParams &params = {}) = 0;
         virtual bool deleteTorrent(const TorrentID &id, DeleteOption deleteOption = DeleteOption::DeleteTorrent) = 0;
-        virtual bool downloadMetadata(const MagnetUri &magnetUri) = 0;
+        virtual bool downloadMetadata(const TorrentDescriptor &torrentDescr) = 0;
         virtual bool cancelDownloadMetadata(const TorrentID &id) = 0;
 
         virtual void recursiveTorrentDownload(const TorrentID &id) = 0;

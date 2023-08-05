@@ -54,11 +54,12 @@ namespace BitTorrent
         bool firstLastPiecePriority = false;
         bool hasFinishedStatus = false;
         bool stopped = false;
-        Torrent::StopCondition stopCondition;
+        Torrent::StopCondition stopCondition = Torrent::StopCondition::None;
 
         bool addToQueueTop = false; // only for new torrents
 
         qreal ratioLimit = Torrent::USE_GLOBAL_RATIO;
         int seedingTimeLimit = Torrent::USE_GLOBAL_SEEDING_TIME;
+        int inactiveSeedingTimeLimit = Torrent::USE_GLOBAL_INACTIVE_SEEDING_TIME;
     };
 }

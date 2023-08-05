@@ -45,9 +45,12 @@
 TorrentTagsDialog::TorrentTagsDialog(const TagSet &initialTags, QWidget *parent)
     : QDialog(parent)
     , m_ui {new Ui::TorrentTagsDialog}
-    , m_storeDialogSize {SETTINGS_KEY(u"Size"_qs)}
+    , m_storeDialogSize {SETTINGS_KEY(u"Size"_s)}
 {
     m_ui->setupUi(this);
+
+    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(m_ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     auto *tagsLayout = new FlowLayout(m_ui->scrollArea);
     for (const QString &tag : asConst(initialTags.united(BitTorrent::Session::instance()->tags())))
@@ -58,7 +61,7 @@ TorrentTagsDialog::TorrentTagsDialog(const TagSet &initialTags, QWidget *parent)
         tagsLayout->addWidget(tagWidget);
     }
 
-    auto *addTagButton = new QPushButton(u"+"_qs);
+    auto *addTagButton = new QPushButton(u"+"_s);
     connect(addTagButton, &QPushButton::clicked, this, &TorrentTagsDialog::addNewTag);
     tagsLayout->addWidget(addTagButton);
 

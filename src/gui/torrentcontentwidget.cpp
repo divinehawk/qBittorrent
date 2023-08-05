@@ -61,6 +61,7 @@ TorrentContentWidget::TorrentContentWidget(QWidget *parent)
 {
     setExpandsOnDoubleClick(false);
     setSortingEnabled(true);
+    setUniformRowHeights(true);
     header()->setSortIndicator(0, Qt::AscendingOrder);
     header()->setFirstSectionMovable(true);
     header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -75,7 +76,7 @@ TorrentContentWidget::TorrentContentWidget(QWidget *parent)
     m_filterModel->setSourceModel(m_model);
     QTreeView::setModel(m_filterModel);
 
-    auto itemDelegate = new TorrentContentItemDelegate(this);
+    auto *itemDelegate = new TorrentContentItemDelegate(this);
     setItemDelegate(itemDelegate);
 
     connect(this, &QAbstractItemView::clicked, this, qOverload<const QModelIndex &>(&QAbstractItemView::edit));
@@ -351,12 +352,12 @@ void TorrentContentWidget::displayContextMenu()
 
         if (!contentHandler()->actualStorageLocation().isEmpty())
         {
-            menu->addAction(UIThemeManager::instance()->getIcon(u"folder-documents"_qs), tr("Open")
+            menu->addAction(UIThemeManager::instance()->getIcon(u"folder-documents"_s), tr("Open")
                             , this, [this, index]() { openItem(index); });
-            menu->addAction(UIThemeManager::instance()->getIcon(u"directory"_qs), tr("Open containing folder")
+            menu->addAction(UIThemeManager::instance()->getIcon(u"directory"_s), tr("Open containing folder")
                             , this, [this, index]() { openParentFolder(index); });
         }
-        menu->addAction(UIThemeManager::instance()->getIcon(u"edit-rename"_qs), tr("Rename...")
+        menu->addAction(UIThemeManager::instance()->getIcon(u"edit-rename"_s), tr("Rename...")
                         , this, &TorrentContentWidget::renameSelectedFile);
         menu->addSeparator();
 
@@ -436,7 +437,7 @@ void TorrentContentWidget::openParentFolder(const QModelIndex &index) const
 
 Path TorrentContentWidget::getFullPath(const QModelIndex &index) const
 {
-    const auto contentHandler = m_model->contentHandler();
+    const auto *contentHandler = m_model->contentHandler();
     if (const int fileIdx = getFileIndex(index); fileIdx >= 0)
     {
         const Path fullPath = contentHandler->actualStorageLocation() / contentHandler->actualFilePath(fileIdx);
@@ -450,10 +451,10 @@ Path TorrentContentWidget::getFullPath(const QModelIndex &index) const
 
 void TorrentContentWidget::onItemDoubleClicked(const QModelIndex &index)
 {
-    const auto contentHandler = m_model->contentHandler();
+    const auto *contentHandler = m_model->contentHandler();
     Q_ASSERT(contentHandler && contentHandler->hasMetadata());
 
-    if (Q_UNLIKELY(!contentHandler || !contentHandler->hasMetadata()))
+    if (!contentHandler || !contentHandler->hasMetadata()) [[unlikely]]
         return;
 
     if (m_doubleClickAction == DoubleClickAction::Rename)

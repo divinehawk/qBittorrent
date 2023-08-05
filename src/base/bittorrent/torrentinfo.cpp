@@ -1,6 +1,6 @@
 /*
  * Bittorrent Client using Qt and libtorrent.
- * Copyright (C) 2015  Vladimir Golovnev <glassez@yandex.ru>
+ * Copyright (C) 2015-2023  Vladimir Golovnev <glassez@yandex.ru>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,6 +42,7 @@
 
 #include "base/global.h"
 #include "base/path.h"
+#include "base/preferences.h"
 #include "base/utils/fs.h"
 #include "base/utils/io.h"
 #include "base/utils/misc.h"
@@ -50,7 +51,7 @@
 
 using namespace BitTorrent;
 
-const int torrentInfoId = qRegisterMetaType<TorrentInfo>();
+const int TORRENTINFO_TYPEID = qRegisterMetaType<TorrentInfo>();
 
 TorrentInfo::TorrentInfo(const lt::torrent_info &nativeInfo)
     : m_nativeInfo {std::make_shared<const lt::torrent_info>(nativeInfo)}
@@ -64,12 +65,6 @@ TorrentInfo::TorrentInfo(const lt::torrent_info &nativeInfo)
         if (!fileStorage.pad_file_at(nativeIndex))
             m_nativeIndexes.append(nativeIndex);
     }
-}
-
-TorrentInfo::TorrentInfo(const TorrentInfo &other)
-    : m_nativeInfo {other.m_nativeInfo}
-    , m_nativeIndexes {other.m_nativeIndexes}
-{
 }
 
 TorrentInfo &TorrentInfo::operator=(const TorrentInfo &other)
@@ -91,12 +86,11 @@ nonstd::expected<TorrentInfo, QString> TorrentInfo::load(const QByteArray &data)
 {
     // 2-step construction to overcome default limits of `depth_limit` & `token_limit` which are
     // used in `torrent_info()` constructor
-    const int depthLimit = 100;
-    const int tokenLimit = 10000000;
+    const auto *pref = Preferences::instance();
 
     lt::error_code ec;
     const lt::bdecode_node node = lt::bdecode(data, ec
-        , nullptr, depthLimit, tokenLimit);
+            , nullptr, pref->getBdecodeDepthLimit(), pref->getBdecodeTokenLimit());
     if (ec)
         return nonstd::make_unexpected(QString::fromStdString(ec.message()));
 
@@ -109,27 +103,20 @@ nonstd::expected<TorrentInfo, QString> TorrentInfo::load(const QByteArray &data)
 
 nonstd::expected<TorrentInfo, QString> TorrentInfo::loadFromFile(const Path &path) noexcept
 {
-    QFile file {path.data()};
-    if (!file.open(QIODevice::ReadOnly))
-        return nonstd::make_unexpected(file.errorString());
-
-    if (file.size() > MAX_TORRENT_SIZE)
-        return nonstd::make_unexpected(tr("File size exceeds max limit %1").arg(Utils::Misc::friendlyUnit(MAX_TORRENT_SIZE)));
-
     QByteArray data;
     try
     {
-        data = file.readAll();
+        const qint64 torrentSizeLimit = Preferences::instance()->getTorrentFileSizeLimit();
+        const auto readResult = Utils::IO::readFile(path, torrentSizeLimit);
+        if (!readResult)
+            return nonstd::make_unexpected(readResult.error().message);
+        data = readResult.value();
     }
     catch (const std::bad_alloc &e)
     {
-        return nonstd::make_unexpected(tr("Torrent file read error: %1").arg(QString::fromLocal8Bit(e.what())));
+        return nonstd::make_unexpected(tr("Failed to allocate memory when reading file. File: \"%1\". Error: \"%2\"")
+            .arg(path.toString(), QString::fromLocal8Bit(e.what())));
     }
-
-    if (data.size() != file.size())
-        return nonstd::make_unexpected(tr("Torrent file read error: size mismatch"));
-
-    file.close();
 
     return load(data);
 }
@@ -412,6 +399,34 @@ TorrentInfo::PieceRange TorrentInfo::filePieces(const int fileIndex) const
     if (fileSize <= 0)
         return {beginIdx, 0};
     return makeInterval(beginIdx, endIdx);
+}
+
+bool TorrentInfo::matchesInfoHash(const InfoHash &otherInfoHash) const
+{
+    if (!isValid())
+        return false;
+
+    const InfoHash thisInfoHash = infoHash();
+
+    if (thisInfoHash.v1().isValid() && otherInfoHash.v1().isValid()
+            && (thisInfoHash.v1() != otherInfoHash.v1()))
+    {
+        return false;
+    }
+
+    if (thisInfoHash.v2().isValid() && otherInfoHash.v2().isValid()
+            && (thisInfoHash.v2() != otherInfoHash.v2()))
+    {
+        return false;
+    }
+
+    if (!thisInfoHash.v1().isValid() && otherInfoHash.v1().isValid())
+        return false;
+
+    if (!thisInfoHash.v2().isValid() && otherInfoHash.v2().isValid())
+        return false;
+
+    return true;
 }
 
 int TorrentInfo::fileIndex(const Path &filePath) const

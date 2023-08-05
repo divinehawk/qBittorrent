@@ -40,9 +40,6 @@
 #if defined(Q_OS_WIN)
 #include <Windows.h>
 #include <Shellapi.h>
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-#include <QtWin>
-#endif
 #else
 #include <QMimeDatabase>
 #include <QMimeType>
@@ -74,7 +71,7 @@ namespace
     {
     public:
         UnifiedFileIconProvider()
-            : m_textPlainIcon {UIThemeManager::instance()->getIcon(u"help-about"_qs, u"text-plain"_qs)}
+            : m_textPlainIcon {UIThemeManager::instance()->getIcon(u"help-about"_s, u"text-plain"_s)}
         {
         }
 
@@ -133,11 +130,7 @@ namespace
             if (FAILED(hr))
                 return {};
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
             const auto iconPixmap = QPixmap::fromImage(QImage::fromHICON(sfi.hIcon));
-#else
-            const QPixmap iconPixmap = QtWin::fromHICON(sfi.hIcon);
-#endif
             ::DestroyIcon(sfi.hIcon);
             return iconPixmap;
         }
@@ -163,7 +156,7 @@ namespace
      */
     bool doesQFileIconProviderWork()
     {
-        const Path PSEUDO_UNIQUE_FILE_NAME = Utils::Fs::tempPath() / Path(u"qBittorrent-test-QFileIconProvider-845eb448-7ad5-4cdb-b764-b3f322a266a9"_qs);
+        const Path PSEUDO_UNIQUE_FILE_NAME = Utils::Fs::tempPath() / Path(u"qBittorrent-test-QFileIconProvider-845eb448-7ad5-4cdb-b764-b3f322a266a9"_s);
         QFileIconProvider provider;
         const QIcon testIcon1 = provider.icon(QFileInfo((PSEUDO_UNIQUE_FILE_NAME + u".pdf").data()));
         const QIcon testIcon2 = provider.icon(QFileInfo((PSEUDO_UNIQUE_FILE_NAME + u".png").data()));
@@ -219,7 +212,7 @@ void TorrentContentModel::updateFilesProgress()
     const QVector<qreal> &filesProgress = m_contentHandler->filesProgress();
     Q_ASSERT(m_filesIndex.size() == filesProgress.size());
     // XXX: Why is this necessary?
-    if (Q_UNLIKELY(m_filesIndex.size() != filesProgress.size()))
+    if (m_filesIndex.size() != filesProgress.size()) [[unlikely]]
         return;
 
     for (int i = 0; i < filesProgress.size(); ++i)
@@ -255,7 +248,7 @@ void TorrentContentModel::updateFilesAvailability()
 
         Q_ASSERT(m_filesIndex.size() == availableFileFractions.size());
         // XXX: Why is this necessary?
-        if (Q_UNLIKELY(m_filesIndex.size() != availableFileFractions.size()))
+        if (m_filesIndex.size() != availableFileFractions.size()) [[unlikely]]
             return;
 
         for (int i = 0; i < m_filesIndex.size(); ++i)

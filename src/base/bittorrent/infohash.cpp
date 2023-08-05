@@ -93,7 +93,7 @@ BitTorrent::InfoHash::operator WrappedType() const
 
 BitTorrent::TorrentID BitTorrent::TorrentID::fromString(const QString &hashString)
 {
-    return TorrentID(BaseType::fromString(hashString));
+    return {BaseType::fromString(hashString)};
 }
 
 BitTorrent::TorrentID BitTorrent::TorrentID::fromInfoHash(const BitTorrent::InfoHash &infoHash)
@@ -103,7 +103,7 @@ BitTorrent::TorrentID BitTorrent::TorrentID::fromInfoHash(const BitTorrent::Info
 
 BitTorrent::TorrentID BitTorrent::TorrentID::fromSHA1Hash(const SHA1Hash &hash)
 {
-    return TorrentID(hash);
+    return {hash};
 }
 
 BitTorrent::TorrentID BitTorrent::TorrentID::fromSHA256Hash(const SHA256Hash &hash)
@@ -111,11 +111,7 @@ BitTorrent::TorrentID BitTorrent::TorrentID::fromSHA256Hash(const SHA256Hash &ha
     return BaseType::UnderlyingType(static_cast<typename SHA256Hash::UnderlyingType>(hash).data());
 }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 std::size_t BitTorrent::qHash(const BitTorrent::TorrentID &key, const std::size_t seed)
-#else
-uint BitTorrent::qHash(const BitTorrent::TorrentID &key, const uint seed)
-#endif
 {
     return ::qHash(static_cast<TorrentID::BaseType>(key), seed);
 }
@@ -123,9 +119,4 @@ uint BitTorrent::qHash(const BitTorrent::TorrentID &key, const uint seed)
 bool BitTorrent::operator==(const BitTorrent::InfoHash &left, const BitTorrent::InfoHash &right)
 {
     return (static_cast<InfoHash::WrappedType>(left) == static_cast<InfoHash::WrappedType>(right));
-}
-
-bool BitTorrent::operator!=(const BitTorrent::InfoHash &left, const BitTorrent::InfoHash &right)
-{
-    return !(left == right);
 }

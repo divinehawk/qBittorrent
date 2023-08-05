@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="de">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="de">
 <context>
     <name>AboutDlg</name>
     <message>
@@ -39,7 +37,7 @@
         <translation>Erstelle Unterordner</translation>
     </message>
     <message>
-        <source>Don't create subfolder</source>
+        <source>Don&apos;t create subfolder</source>
         <translation>Erstelle keinen Unterordner</translation>
     </message>
     <message>
@@ -65,6 +63,10 @@
     <message>
         <source>None</source>
         <translation>Kein</translation>
+    </message>
+    <message>
+        <source>Add to top of queue</source>
+        <translation>In der Warteschlange an erster Stelle hinzufügen</translation>
     </message>
 </context>
 <context>
@@ -111,6 +113,10 @@
     <message>
         <source>Remove torrents</source>
         <translation>Torrents entfernen</translation>
+    </message>
+    <message>
+        <source>Add subcategory...</source>
+        <translation>Unterkategorie hinzufügen ...</translation>
     </message>
 </context>
 <context>
@@ -568,10 +574,6 @@
         <translation>Symbol für DL-Geschwindigkeit</translation>
     </message>
     <message>
-        <source>Connection status</source>
-        <translation>Verbindungs-Status</translation>
-    </message>
-    <message>
         <source>Alternative speed limits: On</source>
         <translation>Alternative Geschwindigkeitsbegrenzung: Ein</translation>
     </message>
@@ -613,7 +615,7 @@
     </message>
     <message>
         <source>Execution Log</source>
-        <translation type="unfinished" />
+        <translation>Ausführungs-Log</translation>
     </message>
     <message>
         <source>Log</source>
@@ -791,10 +793,6 @@
         <translation>Typ:</translation>
     </message>
     <message>
-        <source>(None)</source>
-        <translation type="vanished">(Keiner)</translation>
-    </message>
-    <message>
         <source>SOCKS4</source>
         <translation>SOCKS4</translation>
     </message>
@@ -817,10 +815,6 @@
     <message>
         <source>Use proxy for peer connections</source>
         <translation>Proxy für Peer-Verbindungen verwenden</translation>
-    </message>
-    <message>
-        <source>Use proxy only for torrents</source>
-        <translation type="vanished">Proxy nur für Torrents verwenden</translation>
     </message>
     <message>
         <source>Filter path (.dat, .p2p, .p2b):</source>
@@ -997,8 +991,8 @@
         <translation>%T: aktueller Tracker</translation>
     </message>
     <message>
-        <source>Tip: Encapsulate parameter with quotation marks to avoid text being cut off at whitespace (e.g., "%N")</source>
-        <translation>Tipp: Setze Parameter zwischen Anführungszeichen damit Text bei Leerzeichen nicht abgeschnitten wird (z.B. "%N").</translation>
+        <source>Tip: Encapsulate parameter with quotation marks to avoid text being cut off at whitespace (e.g., &quot;%N&quot;)</source>
+        <translation>Tipp: Setze Parameter zwischen Anführungszeichen damit Text bei Leerzeichen nicht abgeschnitten wird (z.B. &quot;%N&quot;).</translation>
     </message>
     <message>
         <source>The Web UI username must be at least 3 characters long.</source>
@@ -1217,10 +1211,6 @@
         <translation>libtorrent-Abschnitt</translation>
     </message>
     <message>
-        <source>Outgoing ports (Min) [0: Disabled]:</source>
-        <translation>Ausgehende Ports (Min) [0: Deaktiviert]:</translation>
-    </message>
-    <message>
         <source>Recheck torrents on completion:</source>
         <translation>Torrents nach Abschluss der Übertragung erneut prüfen:</translation>
     </message>
@@ -1239,10 +1229,6 @@
     <message>
         <source>Remove torrent</source>
         <translation>Torrent entfernen</translation>
-    </message>
-    <message>
-        <source>Outgoing ports (Max) [0: Disabled]:</source>
-        <translation>Ausgehende Ports (Max) [0: Deaktiviert]:</translation>
     </message>
     <message>
         <source>Asynchronous I/O threads:</source>
@@ -1321,20 +1307,12 @@
         <translation>Bannen für:</translation>
     </message>
     <message>
-        <source>Stop tracker timeout:</source>
-        <translation>Halte die Tracker-Auszeit an:</translation>
-    </message>
-    <message>
         <source>Ban client after consecutive failures:</source>
         <translation>Programm nach aufeinanderfolgenden Fehlern sperren:</translation>
     </message>
     <message>
         <source>Enable cookie Secure flag (requires HTTPS)</source>
         <translation>Cookie Sicheres Flag aktivieren (erfordert HTTPS)</translation>
-    </message>
-    <message>
-        <source>UPnP lease duration [0: Permanent lease]:</source>
-        <translation>UPnP-Mietdauer [0: Permanent]:</translation>
     </message>
     <message>
         <source>Header: value pairs, one per line</source>
@@ -1351,14 +1329,6 @@
     <message>
         <source>Enable fetching RSS feeds</source>
         <translation>Aktiviere RSS-Feeds</translation>
-    </message>
-    <message>
-        <source>Hashing threads (requires libtorrent &gt;= 2.0):</source>
-        <translation>Zerlege Threads (erfordert libtorrent &gt;= 2.0):</translation>
-    </message>
-    <message>
-        <source>Coalesce reads &amp; writes (requires libtorrent &lt; 2.0):</source>
-        <translation>Verbundene Schreib- u. Lesezugriffe (erfordert libtorrent &lt; 2.0):</translation>
     </message>
     <message>
         <source>Peer turnover threshold percentage:</source>
@@ -1425,14 +1395,6 @@
         <translation>RSS Smart-Folgenfilter</translation>
     </message>
     <message>
-        <source>Disk cache (requires libtorrent &lt; 2.0):</source>
-        <translation>Festplatten-Cache (erfordert libtorrent &lt;2.0):</translation>
-    </message>
-    <message>
-        <source>Disk cache expiry interval (requires libtorrent &lt; 2.0):</source>
-        <translation>Ablaufintervall des Festplatten-Cache (erfordert libtorrent &lt;2.0):</translation>
-    </message>
-    <message>
         <source>Validate HTTPS tracker certificate:</source>
         <translation>HTTPS-Tracker-Zertifikate überprüfen:</translation>
     </message>
@@ -1453,7 +1415,7 @@
         <translation>Original</translation>
     </message>
     <message>
-        <source>Don't create subfolder</source>
+        <source>Don&apos;t create subfolder</source>
         <translation>Erstelle keinen Unterordner</translation>
     </message>
     <message>
@@ -1537,14 +1499,6 @@
         <translation>Diese Option ist unter Linux weniger effektiv</translation>
     </message>
     <message>
-        <source>Disk IO type (libtorrent &gt;= 2.0; requires restart):</source>
-        <translation>Festplatten-IO-Typ (libtorrent &gt;= 2.0; Neustart benötigt):</translation>
-    </message>
-    <message>
-        <source>Write-through (requires libtorrent &gt;= 2.0.6)</source>
-        <translation>Durchschrift (erfordert libtorrent &gt;= 2.0.6)</translation>
-    </message>
-    <message>
         <source>It controls the internal state update interval which in turn will affect UI updates</source>
         <translation>Es steuert das Intervall für die interne Statusaktualisierung, was sich auch auf die Aktualisierungen der Benutzeroberfläche auswirkt.</translation>
     </message>
@@ -1577,10 +1531,6 @@
         <translation>Aktualisierungsintervall:</translation>
     </message>
     <message>
-        <source>Physical memory (RAM) usage limit (applied if libtorrent &gt;= 2.0):</source>
-        <translation>Physikalischer Speicher (RAM) Benutzerlimit (wird angewendet, wenn libtorrent &gt;= 2.0):</translation>
-    </message>
-    <message>
         <source>ms</source>
         <translation>ms</translation>
     </message>
@@ -1601,14 +1551,14 @@
 In order to defend against DNS rebinding attack,
 you should put in domain names used by WebUI server.
 
-Use ';' to split multiple entries. Can use wildcard '*'.</source>
+Use &apos;;&apos; to split multiple entries. Can use wildcard &apos;*&apos;.</source>
         <translation>Liste der erlaubten HTTP-Host Header-Felder.
 Um sich vor DNS-Rebinding-Attacken zu schützen,
 sollten hier Domain-Namen eingetragen weden,
 die vom WebUI-Server verwendet werden.
 
-Verwende ';' um mehrere Einträge zu trennen.
-Platzhalter '*' kann verwendet werden.</translation>
+Verwende &apos;;&apos; um mehrere Einträge zu trennen.
+Platzhalter &apos;*&apos; kann verwendet werden.</translation>
     </message>
     <message>
         <source>Run external program on torrent added</source>
@@ -1619,8 +1569,8 @@ Platzhalter '*' kann verwendet werden.</translation>
         <translation>Das HTTPS-Zertifkat sollte nicht leer sein</translation>
     </message>
     <message>
-        <source>Specify reverse proxy IPs (or subnets, e.g. 0.0.0.0/24) in order to use forwarded client address (X-Forwarded-For header). Use ';' to split multiple entries.</source>
-        <translation>Geben Sie Reverse-Proxy-IPs an (oder Subnetze, z.B. 0.0.0.0/24), um weitergeleitete Client-Adressen zu verwenden (Attribut X-Forwarded-For), verwenden Sie ';' um mehrere Einträge aufzuteilen.</translation>
+        <source>Specify reverse proxy IPs (or subnets, e.g. 0.0.0.0/24) in order to use forwarded client address (X-Forwarded-For header). Use &apos;;&apos; to split multiple entries.</source>
+        <translation>Geben Sie Reverse-Proxy-IPs an (oder Subnetze, z.B. 0.0.0.0/24), um weitergeleitete Client-Adressen zu verwenden (Attribut X-Forwarded-For), verwenden Sie &apos;;&apos; um mehrere Einträge aufzuteilen.</translation>
     </message>
     <message>
         <source>HTTPS key should not be empty</source>
@@ -1664,63 +1614,123 @@ Platzhalter '*' kann verwendet werden.</translation>
     </message>
     <message>
         <source>SQLite database (experimental)</source>
-        <translation type="unfinished" />
+        <translation>SQLite-Datenbank (experimentell)</translation>
     </message>
     <message>
         <source>Resume data storage type (requires restart):</source>
-        <translation type="unfinished" />
+        <translation>Speichertyp der Fortsetzungsdaten (Programmneustart erforderlich):</translation>
     </message>
     <message>
         <source>Fastresume files</source>
-        <translation type="unfinished" />
+        <translation>Fastresume Dateien</translation>
     </message>
     <message>
         <source>Backup the log file after:</source>
-        <translation type="unfinished" />
+        <translation>Sichere die Protokolldatei nach:</translation>
     </message>
     <message>
         <source>days</source>
-        <translation type="unfinished" />
+        <translation>Tage</translation>
     </message>
     <message>
         <source>Log file</source>
-        <translation type="unfinished" />
+        <translation>Protokolldatei</translation>
     </message>
     <message>
         <source>Behavior</source>
-        <translation type="unfinished" />
+        <translation>Verhalten</translation>
     </message>
     <message>
         <source>Delete backup logs older than:</source>
-        <translation type="unfinished" />
+        <translation>Lösche Sicherungen älter als:</translation>
     </message>
     <message>
         <source>Use proxy for BitTorrent purposes</source>
-        <translation type="unfinished" />
+        <translation>Proxy für BitTorrent verwenden</translation>
     </message>
     <message>
         <source>years</source>
-        <translation type="unfinished" />
+        <translation>Jahre</translation>
     </message>
     <message>
         <source>Save path:</source>
-        <translation type="unfinished" />
+        <translation>Speicherpfad:</translation>
     </message>
     <message>
         <source>months</source>
-        <translation type="unfinished" />
+        <translation>Monate</translation>
     </message>
     <message>
         <source>Remember Multi-Rename settings</source>
-        <translation type="unfinished" />
+        <translation>Multi-Rename-Einstellungen merken</translation>
     </message>
     <message>
         <source>Use proxy for general purposes</source>
-        <translation type="unfinished" />
+        <translation>Proxy für allgemeine Zwecke verwenden</translation>
     </message>
     <message>
         <source>Use proxy for RSS purposes</source>
-        <translation type="unfinished" />
+        <translation>Proxy für RSS-Zwecke verwenden</translation>
+    </message>
+    <message>
+        <source>Disk cache expiry interval (requires libtorrent &amp;lt; 2.0):</source>
+        <translation>Ablaufintervall des Festplatten-Caches (erfordert libtorrent &amp;lt; 2.0):</translation>
+    </message>
+    <message>
+        <source>Physical memory (RAM) usage limit (applied if libtorrent &amp;gt;= 2.0):</source>
+        <translation>Physikalischer Speicher (RAM) Benutzerlimit (wird angewendet, wenn libtorrent &amp;gt;= 2.0):</translation>
+    </message>
+    <message>
+        <source>Disk cache (requires libtorrent &amp;lt; 2.0):</source>
+        <translation>Festplatten-Cache (erfordert libtorrent &amp;lt; 2.0):</translation>
+    </message>
+    <message>
+        <source>Socket send buffer size [0: system default]:</source>
+        <translation>Socket-Sendepuffergröße [0: Systemvorgabe]:</translation>
+    </message>
+    <message>
+        <source>Coalesce reads &amp;amp; writes (requires libtorrent &amp;lt; 2.0):</source>
+        <translation>Verbundene Schreib- u. Lesezugriffe (erfordert libtorrent &amp;lt; 2.0):</translation>
+    </message>
+    <message>
+        <source>Outgoing ports (Max) [0: disabled]:</source>
+        <translation>Ausgehende Ports (Max) [0: deaktiviert]:</translation>
+    </message>
+    <message>
+        <source>Socket receive buffer size [0: system default]:</source>
+        <translation>Socket-Empfangspuffergröße [0: Systemvorgabe]:</translation>
+    </message>
+    <message>
+        <source>Use Subcategories</source>
+        <translation>Unterkategorien verwenden</translation>
+    </message>
+    <message>
+        <source>Disk IO type (libtorrent &amp;gt;= 2.0; requires restart):</source>
+        <translation>Festplatten-IO-Typ (libtorrent &amp;gt;= 2.0; Neustart benötigt):</translation>
+    </message>
+    <message>
+        <source>Add to top of queue</source>
+        <translation>In der Warteschlange an erster Stelle hinzufügen</translation>
+    </message>
+    <message>
+        <source>Write-through (requires libtorrent &amp;gt;= 2.0.6)</source>
+        <translation>Durchschrift (erfordert libtorrent &amp;gt;= 2.0.6)</translation>
+    </message>
+    <message>
+        <source>Stop tracker timeout [0: disabled]:</source>
+        <translation>Halte die Tracker-Auszeit an [0: deaktiviert]:</translation>
+    </message>
+    <message>
+        <source>Outgoing ports (Min) [0: disabled]:</source>
+        <translation>Ausgehende Ports (Min) [0: deaktiviert]:</translation>
+    </message>
+    <message>
+        <source>Hashing threads (requires libtorrent &amp;gt;= 2.0):</source>
+        <translation>Zerlege Threads (erfordert libtorrent &amp;gt;= 2.0):</translation>
+    </message>
+    <message>
+        <source>UPnP lease duration [0: permanent lease]:</source>
+        <translation>UPnP-Mietdauer [0: permanent]:</translation>
     </message>
 </context>
 <context>
@@ -2028,63 +2038,63 @@ Platzhalter '*' kann verwendet werden.</translation>
     </message>
     <message>
         <source>Use regular expressions</source>
-        <translation type="unfinished" />
+        <translation>Reguläre Ausdrücke verwenden</translation>
     </message>
     <message>
         <source>Filename</source>
-        <translation type="unfinished" />
+        <translation>Dateiname</translation>
     </message>
     <message>
         <source>Filename + Extension</source>
-        <translation type="unfinished" />
+        <translation>Dateiname + Erweiterung</translation>
     </message>
     <message>
         <source>Enumerate Files</source>
-        <translation type="unfinished" />
+        <translation>Dateien aufzählen</translation>
     </message>
     <message>
         <source>Rename failed: file or folder already exists</source>
-        <translation type="unfinished" />
+        <translation>Fehler beim Umbenennen: Datei oder Verzeichnis existiert bereits</translation>
     </message>
     <message>
         <source>Match all occurences</source>
-        <translation type="unfinished" />
+        <translation>Alle Vorkommen abgleichen</translation>
     </message>
     <message>
         <source>Toggle Selection</source>
-        <translation type="unfinished" />
+        <translation>Auswahl Umschalten</translation>
     </message>
     <message>
         <source>Replacement Input</source>
-        <translation type="unfinished" />
+        <translation>Eingabe für Ersetzen</translation>
     </message>
     <message>
         <source>Replace</source>
-        <translation type="unfinished" />
+        <translation>Ersetzen</translation>
     </message>
     <message>
         <source>Extension</source>
-        <translation type="unfinished" />
+        <translation>Erweiterung</translation>
     </message>
     <message>
         <source>Replace All</source>
-        <translation type="unfinished" />
+        <translation>Alle Ersetzen</translation>
     </message>
     <message>
         <source>Include files</source>
-        <translation type="unfinished" />
+        <translation>Dateien einschließen</translation>
     </message>
     <message>
         <source>Include folders</source>
-        <translation type="unfinished" />
+        <translation>Verzeichnisse einschließen</translation>
     </message>
     <message>
         <source>Search Files</source>
-        <translation type="unfinished" />
+        <translation>Dateien suchen</translation>
     </message>
     <message>
         <source>Case sensitive</source>
-        <translation type="unfinished" />
+        <translation>Groß- und Kleinschreibung berücksichtigt</translation>
     </message>
 </context>
 <context>
@@ -2563,11 +2573,11 @@ Platzhalter '*' kann verwendet werden.</translation>
     </message>
     <message>
         <source>Renamed</source>
-        <translation type="unfinished" />
+        <translation>Umbenannt</translation>
     </message>
     <message>
         <source>Original</source>
-        <translation type="unfinished" />
+        <translation>Original</translation>
     </message>
 </context>
 <context>
@@ -2674,6 +2684,10 @@ Platzhalter '*' kann verwendet werden.</translation>
     <message>
         <source>Trackers</source>
         <translation>Tracker</translation>
+    </message>
+    <message>
+        <source>Collapse/expand</source>
+        <translation>Zuklappen/Erweitern</translation>
     </message>
 </context>
 <context>
@@ -2865,11 +2879,11 @@ Platzhalter '*' kann verwendet werden.</translation>
     </message>
     <message>
         <source>Rename Files...</source>
-        <translation type="unfinished" />
+        <translation>Dateien umbenennen ...</translation>
     </message>
     <message>
         <source>Renaming</source>
-        <translation type="unfinished" />
+        <translation>Umbenennen</translation>
     </message>
 </context>
 <context>
@@ -3105,11 +3119,11 @@ Platzhalter '*' kann verwendet werden.</translation>
         <translation>angezeigt</translation>
     </message>
     <message>
-        <source>Click the "Search plugins..." button at the bottom right of the window to install some.</source>
-        <translation>Klicke den "Such-Plugins ..."-Knopf unten rechts um welche zu installieren.</translation>
+        <source>Click the &quot;Search plugins...&quot; button at the bottom right of the window to install some.</source>
+        <translation>Klicke den &quot;Such-Plugins ...&quot;-Knopf unten rechts um welche zu installieren.</translation>
     </message>
     <message>
-        <source>There aren't any search plugins installed.</source>
+        <source>There aren&apos;t any search plugins installed.</source>
         <translation>Es sind keine Such-Plugins installiert.</translation>
     </message>
 </context>
@@ -3140,7 +3154,7 @@ Platzhalter '*' kann verwendet werden.</translation>
         <translation>Aktiviert</translation>
     </message>
     <message>
-        <source>Warning: Be sure to comply with your country's copyright laws when downloading torrents from any of these search engines.</source>
+        <source>Warning: Be sure to comply with your country&apos;s copyright laws when downloading torrents from any of these search engines.</source>
         <translation>Warnung: Achten Sie darauf, die Urheberrechtsgesetze Ihres Landes zu befolgen, wenn Sie von einer dieser Suchmaschinen Torrents herunterladen.</translation>
     </message>
     <message>
@@ -3416,7 +3430,7 @@ Platzhalter '*' kann verwendet werden.</translation>
     </message>
     <message>
         <source>Renaming)</source>
-        <translation type="unfinished" />
+        <translation>Umbenennen)</translation>
     </message>
 </context>
 <context>
@@ -3759,7 +3773,7 @@ Er unterstützt die Formate: S01E01, 1x1, 2017.12.31 und 31.12.2017 (Datums-Form
         <translation>Original</translation>
     </message>
     <message>
-        <source>Don't create subfolder</source>
+        <source>Don&apos;t create subfolder</source>
         <translation>Erstelle keinen Unterordner</translation>
     </message>
 </context>
@@ -3801,7 +3815,7 @@ Er unterstützt die Formate: S01E01, 1x1, 2017.12.31 und 31.12.2017 (Datums-Form
     <name>ExecutionLogWidget</name>
     <message>
         <source>General</source>
-        <translation type="unfinished" />
+        <translation>Allgemein</translation>
     </message>
     <message>
         <source>Blocked</source>
@@ -3817,7 +3831,7 @@ Er unterstützt die Formate: S01E01, 1x1, 2017.12.31 und 31.12.2017 (Datums-Form
     </message>
     <message>
         <source>showing</source>
-        <translation type="unfinished" />
+        <translation>angezeigt</translation>
     </message>
     <message>
         <source>Copy</source>
@@ -3833,7 +3847,7 @@ Er unterstützt die Formate: S01E01, 1x1, 2017.12.31 und 31.12.2017 (Datums-Form
     </message>
     <message>
         <source>Log Type</source>
-        <translation type="unfinished" />
+        <translation>Protokolltyp</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -3861,7 +3875,7 @@ Er unterstützt die Formate: S01E01, 1x1, 2017.12.31 und 31.12.2017 (Datums-Form
     </message>
     <message>
         <source>out of</source>
-        <translation type="unfinished" />
+        <translation>von</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3869,7 +3883,7 @@ Er unterstützt die Formate: S01E01, 1x1, 2017.12.31 und 31.12.2017 (Datums-Form
     </message>
     <message>
         <source>Timestamp</source>
-        <translation type="unfinished" />
+        <translation>Zeitstempel</translation>
     </message>
     <message>
         <source>Clear All</source>
@@ -3881,7 +3895,7 @@ Er unterstützt die Formate: S01E01, 1x1, 2017.12.31 und 31.12.2017 (Datums-Form
     </message>
     <message>
         <source>Log Levels:</source>
-        <translation type="unfinished" />
+        <translation>Protokollebenen:</translation>
     </message>
     <message>
         <source>Reason</source>

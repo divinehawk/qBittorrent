@@ -100,11 +100,7 @@ namespace BitTorrent
         Error
     };
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
     std::size_t qHash(TorrentState key, std::size_t seed = 0);
-#else
-    uint qHash(TorrentState key, uint seed = 0);
-#endif
 
     class Torrent : public TorrentContentHandler
     {
@@ -126,8 +122,12 @@ namespace BitTorrent
         static const int USE_GLOBAL_SEEDING_TIME;
         static const int NO_SEEDING_TIME_LIMIT;
 
+        static const int USE_GLOBAL_INACTIVE_SEEDING_TIME;
+        static const int NO_INACTIVE_SEEDING_TIME_LIMIT;
+
         static const qreal MAX_RATIO;
         static const int MAX_SEEDING_TIME;
+        static const int MAX_INACTIVE_SEEDING_TIME;
 
         using TorrentContentHandler::TorrentContentHandler;
 
@@ -192,7 +192,6 @@ namespace BitTorrent
         virtual void setSavePath(const Path &savePath) = 0;
         virtual Path downloadPath() const = 0;
         virtual void setDownloadPath(const Path &downloadPath) = 0;
-        virtual Path actualStorageLocation() const = 0;
         virtual Path rootPath() const = 0;
         virtual Path contentPath() const = 0;
         virtual QString category() const = 0;
@@ -211,10 +210,9 @@ namespace BitTorrent
         virtual QDateTime addedTime() const = 0;
         virtual qreal ratioLimit() const = 0;
         virtual int seedingTimeLimit() const = 0;
+        virtual int inactiveSeedingTimeLimit() const = 0;
 
-        virtual Path actualFilePath(int index) const = 0;
         virtual PathList filePaths() const = 0;
-        virtual QVector<DownloadPriority> filePriorities() const = 0;
 
         virtual TorrentInfo info() const = 0;
         virtual bool isFinished() const = 0;
@@ -232,7 +230,6 @@ namespace BitTorrent
         virtual bool isSequentialDownload() const = 0;
         virtual bool hasFirstLastPiecePriority() const = 0;
         virtual TorrentState state() const = 0;
-        virtual bool hasMetadata() const = 0;
         virtual bool hasMissingFiles() const = 0;
         virtual bool hasError() const = 0;
         virtual int queuePosition() const = 0;
@@ -244,7 +241,6 @@ namespace BitTorrent
         virtual qlonglong activeTime() const = 0;
         virtual qlonglong finishedTime() const = 0;
         virtual qlonglong eta() const = 0;
-        virtual QVector<qreal> filesProgress() const = 0;
         virtual int seedsCount() const = 0;
         virtual int peersCount() const = 0;
         virtual int leechsCount() const = 0;
@@ -269,6 +265,7 @@ namespace BitTorrent
         virtual qreal distributedCopies() const = 0;
         virtual qreal maxRatio() const = 0;
         virtual int maxSeedingTime() const = 0;
+        virtual int maxInactiveSeedingTime() const = 0;
         virtual qreal realRatio() const = 0;
         virtual int uploadPayloadRate() const = 0;
         virtual int downloadPayloadRate() const = 0;
@@ -277,13 +274,6 @@ namespace BitTorrent
         virtual int connectionsCount() const = 0;
         virtual int connectionsLimit() const = 0;
         virtual qlonglong nextAnnounce() const = 0;
-        /**
-         * @brief fraction of file pieces that are available at least from one peer
-         *
-         * This is not the same as torrrent availability, it is just a fraction of pieces
-         * that can be downloaded right now. It varies between 0 to 1.
-         */
-        virtual QVector<qreal> availableFileFractions() const = 0;
 
         virtual void setName(const QString &name) = 0;
         virtual void setSequentialDownload(bool enable) = 0;
@@ -295,13 +285,13 @@ namespace BitTorrent
         virtual void forceRecheck() = 0;
         virtual void setRatioLimit(qreal limit) = 0;
         virtual void setSeedingTimeLimit(int limit) = 0;
+        virtual void setInactiveSeedingTimeLimit(int limit) = 0;
         virtual void setUploadLimit(int limit) = 0;
         virtual void setDownloadLimit(int limit) = 0;
         virtual void setSuperSeeding(bool enable) = 0;
         virtual void setDHTDisabled(bool disable) = 0;
         virtual void setPEXDisabled(bool disable) = 0;
         virtual void setLSDDisabled(bool disable) = 0;
-        virtual void flushCache() const = 0;
         virtual void addTrackers(QVector<TrackerEntry> trackers) = 0;
         virtual void removeTrackers(const QStringList &trackers) = 0;
         virtual void replaceTrackers(QVector<TrackerEntry> trackers) = 0;

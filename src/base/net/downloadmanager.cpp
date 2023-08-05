@@ -62,11 +62,10 @@ public:
     {
         const QDateTime now = QDateTime::currentDateTime();
         QList<QNetworkCookie> cookies = Preferences::instance()->getNetworkCookies();
-        for (const QNetworkCookie &cookie : asConst(Preferences::instance()->getNetworkCookies()))
+        cookies.removeIf([&now](const QNetworkCookie &cookie)
         {
-            if (cookie.isSessionCookie() || (cookie.expirationDate() <= now))
-                cookies.removeAll(cookie);
-        }
+            return cookie.isSessionCookie() || (cookie.expirationDate() <= now);
+        });
 
         setAllCookies(cookies);
     }
@@ -75,11 +74,10 @@ public:
     {
         const QDateTime now = QDateTime::currentDateTime();
         QList<QNetworkCookie> cookies = allCookies();
-        for (const QNetworkCookie &cookie : asConst(allCookies()))
+        cookies.removeIf([&now](const QNetworkCookie &cookie)
         {
-            if (cookie.isSessionCookie() || (cookie.expirationDate() <= now))
-                cookies.removeAll(cookie);
-        }
+            return cookie.isSessionCookie() || (cookie.expirationDate() <= now);
+        });
 
         Preferences::instance()->setNetworkCookies(cookies);
     }
@@ -91,11 +89,10 @@ public:
     {
         const QDateTime now = QDateTime::currentDateTime();
         QList<QNetworkCookie> cookies = QNetworkCookieJar::cookiesForUrl(url);
-        for (const QNetworkCookie &cookie : asConst(QNetworkCookieJar::cookiesForUrl(url)))
+        cookies.removeIf([&now](const QNetworkCookie &cookie)
         {
-            if (!cookie.isSessionCookie() && (cookie.expirationDate() <= now))
-                cookies.removeAll(cookie);
-        }
+            return !cookie.isSessionCookie() && (cookie.expirationDate() <= now);
+        });
 
         return cookies;
     }
@@ -104,11 +101,10 @@ public:
     {
         const QDateTime now = QDateTime::currentDateTime();
         QList<QNetworkCookie> cookies = cookieList;
-        for (const QNetworkCookie &cookie : cookieList)
+        cookies.removeIf([&now](const QNetworkCookie &cookie)
         {
-            if (!cookie.isSessionCookie() && (cookie.expirationDate() <= now))
-                cookies.removeAll(cookie);
-        }
+            return !cookie.isSessionCookie() && (cookie.expirationDate() <= now);
+        });
 
         return QNetworkCookieJar::setCookiesFromUrl(cookies, url);
     }
@@ -163,7 +159,7 @@ Net::DownloadHandler *Net::DownloadManager::download(const DownloadRequest &down
     const ServiceID id = ServiceID::fromURL(downloadRequest.url());
     const bool isSequentialService = m_sequentialServices.contains(id);
 
-    auto downloadHandler = new DownloadHandlerImpl(this, downloadRequest, useProxy);
+    auto *downloadHandler = new DownloadHandlerImpl(this, downloadRequest, useProxy);
     connect(downloadHandler, &DownloadHandler::finished, downloadHandler, &QObject::deleteLater);
     connect(downloadHandler, &QObject::destroyed, this, [this, id, downloadHandler]()
     {
@@ -231,36 +227,36 @@ void Net::DownloadManager::applyProxySettings()
 
     m_proxy = QNetworkProxy(QNetworkProxy::NoProxy);
 
-    if (proxyConfig.type != ProxyType::SOCKS4)
+    if ((proxyConfig.type == Net::ProxyType::None) || (proxyConfig.type == ProxyType::SOCKS4))
+        return;
+
+    // Proxy enabled
+    if (proxyConfig.type == ProxyType::SOCKS5)
     {
-        // Proxy enabled
-        if (proxyConfig.type == ProxyType::SOCKS5)
-        {
-            qDebug() << Q_FUNC_INFO << "using SOCKS proxy";
-            m_proxy.setType(QNetworkProxy::Socks5Proxy);
-        }
-        else
-        {
-            qDebug() << Q_FUNC_INFO << "using HTTP proxy";
-            m_proxy.setType(QNetworkProxy::HttpProxy);
-        }
-
-        m_proxy.setHostName(proxyConfig.ip);
-        m_proxy.setPort(proxyConfig.port);
-
-        // Authentication?
-        if (proxyConfig.authEnabled)
-        {
-            qDebug("Proxy requires authentication, authenticating...");
-            m_proxy.setUser(proxyConfig.username);
-            m_proxy.setPassword(proxyConfig.password);
-        }
-
-        if (proxyConfig.hostnameLookupEnabled)
-            m_proxy.setCapabilities(m_proxy.capabilities() | QNetworkProxy::HostNameLookupCapability);
-        else
-            m_proxy.setCapabilities(m_proxy.capabilities() & ~QNetworkProxy::HostNameLookupCapability);
+        qDebug() << Q_FUNC_INFO << "using SOCKS proxy";
+        m_proxy.setType(QNetworkProxy::Socks5Proxy);
     }
+    else
+    {
+        qDebug() << Q_FUNC_INFO << "using HTTP proxy";
+        m_proxy.setType(QNetworkProxy::HttpProxy);
+    }
+
+    m_proxy.setHostName(proxyConfig.ip);
+    m_proxy.setPort(proxyConfig.port);
+
+    // Authentication?
+    if (proxyConfig.authEnabled)
+    {
+        qDebug("Proxy requires authentication, authenticating...");
+        m_proxy.setUser(proxyConfig.username);
+        m_proxy.setPassword(proxyConfig.password);
+    }
+
+    if (proxyConfig.hostnameLookupEnabled)
+        m_proxy.setCapabilities(m_proxy.capabilities() | QNetworkProxy::HostNameLookupCapability);
+    else
+        m_proxy.setCapabilities(m_proxy.capabilities() & ~QNetworkProxy::HostNameLookupCapability);
 }
 
 void Net::DownloadManager::handleDownloadFinished(DownloadHandlerImpl *finishedHandler)
@@ -274,7 +270,7 @@ void Net::DownloadManager::handleDownloadFinished(DownloadHandlerImpl *finishedH
         return;
     }
 
-    auto handler = waitingJobsIter.value().dequeue();
+    auto *handler = waitingJobsIter.value().dequeue();
     qDebug("Downloading %s...", qUtf8Printable(handler->url()));
     processRequest(handler);
     handler->disconnect(this);
@@ -376,17 +372,10 @@ Net::ServiceID Net::ServiceID::fromURL(const QUrl &url)
     return {url.host(), url.port(80)};
 }
 
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 std::size_t Net::qHash(const ServiceID &serviceID, const std::size_t seed)
 {
     return qHashMulti(seed, serviceID.hostName, serviceID.port);
 }
-#else
-uint Net::qHash(const ServiceID &serviceID, const uint seed)
-{
-    return ::qHash(serviceID.hostName, seed) ^ ::qHash(serviceID.port);
-}
-#endif
 
 bool Net::operator==(const ServiceID &lhs, const ServiceID &rhs)
 {

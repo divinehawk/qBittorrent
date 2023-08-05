@@ -63,8 +63,8 @@ private slots:
     void categoryAdded(const QString &categoryName);
     void categoryRemoved(const QString &categoryName);
     void torrentsLoaded(const QVector<BitTorrent::Torrent *> &torrents);
-    void torrentAboutToBeRemoved(BitTorrent::Torrent *const torrent);
-    void torrentCategoryChanged(BitTorrent::Torrent *const torrent, const QString &oldCategory);
+    void torrentAboutToBeRemoved(BitTorrent::Torrent *torrent);
+    void torrentCategoryChanged(BitTorrent::Torrent *torrent, const QString &oldCategory);
     void subcategoriesSupportChanged();
 
 private:
@@ -72,6 +72,6 @@ private:
     QModelIndex index(CategoryModelItem *item) const;
     CategoryModelItem *findItem(const QString &fullName) const;
 
-    bool m_isSubcategoriesEnabled;
+    bool m_isSubcategoriesEnabled = false;
     CategoryModelItem *m_rootItem = nullptr;
 };

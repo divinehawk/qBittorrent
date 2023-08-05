@@ -57,8 +57,6 @@ window.qBittorrent.DynamicTable = (function() {
         };
     };
 
-    const naturalSortCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
-
     const compareNumbers = (val1, val2) => {
         if (val1 < val2)
             return -1;
@@ -412,7 +410,7 @@ window.qBittorrent.DynamicTable = (function() {
                 const value2 = this.getRowValue(row2);
                 if ((typeof(value1) === 'number') && (typeof(value2) === 'number'))
                     return compareNumbers(value1, value2);
-                return naturalSortCollator.compare(value1, value2);
+                return window.qBittorrent.Misc.naturalSortCollator.compare(value1, value2);
             };
             column['updateTd'] = function(td, row) {
                 const value = this.getRowValue(row);
@@ -1137,9 +1135,9 @@ window.qBittorrent.DynamicTable = (function() {
             // progress
             this.columns['progress'].updateTd = function(td, row) {
                 const progress = this.getRowValue(row);
-                let progressFormated = (progress * 100).round(1);
-                if (progressFormated == 100.0 && progress != 1.0)
-                    progressFormated = 99.9;
+                let progressFormatted = (progress * 100).round(1);
+                if (progressFormatted == 100.0 && progress != 1.0)
+                    progressFormatted = 99.9;
 
                 if (td.getChildren('div').length > 0) {
                     const div = td.getChildren('div')[0];
@@ -1147,13 +1145,13 @@ window.qBittorrent.DynamicTable = (function() {
                         td.resized = false;
                         div.setWidth(ProgressColumnWidth - 5);
                     }
-                    if (div.getValue() != progressFormated)
-                        div.setValue(progressFormated);
+                    if (div.getValue() != progressFormatted)
+                        div.setValue(progressFormatted);
                 }
                 else {
                     if (ProgressColumnWidth < 0)
                         ProgressColumnWidth = td.offsetWidth;
-                    td.adopt(new window.qBittorrent.ProgressBar.ProgressBar(progressFormated.toFloat(), {
+                    td.adopt(new window.qBittorrent.ProgressBar.ProgressBar(progressFormatted.toFloat(), {
                         'width': ProgressColumnWidth - 5
                     }));
                     td.resized = false;
@@ -1594,12 +1592,12 @@ window.qBittorrent.DynamicTable = (function() {
             // progress
             this.columns['progress'].updateTd = function(td, row) {
                 const progress = this.getRowValue(row);
-                let progressFormated = (progress * 100).round(1);
-                if (progressFormated == 100.0 && progress != 1.0)
-                    progressFormated = 99.9;
-                progressFormated += "%";
-                td.set('text', progressFormated);
-                td.set('title', progressFormated);
+                let progressFormatted = (progress * 100).round(1);
+                if (progressFormatted == 100.0 && progress != 1.0)
+                    progressFormatted = 99.9;
+                progressFormatted += "%";
+                td.set('text', progressFormatted);
+                td.set('title', progressFormatted);
             };
 
             // dl_speed, up_speed
@@ -2705,7 +2703,7 @@ window.qBittorrent.DynamicTable = (function() {
                 const value2 = this.getRowValue(row2);
                 if ((typeof(value1) === 'number') && (typeof(value2) === 'number'))
                     return compareNumbers(value1, value2);
-                return naturalSortCollator.compare(value1, value2);
+                return window.qBittorrent.Misc.naturalSortCollator.compare(value1, value2);
             };
             column['updateTd'] = function(td, row) {
                 const value = this.getRowValue(row);
@@ -2801,7 +2799,7 @@ window.qBittorrent.DynamicTable = (function() {
                 const value2 = this.getRowValue(row2);
                 if ((typeof(value1) === 'number') && (typeof(value2) === 'number'))
                     return compareNumbers(value1, value2);
-                return naturalSortCollator.compare(value1, value2);
+                return window.qBittorrent.Misc.naturalSortCollator.compare(value1, value2);
             };
             column['updateTd'] = function(td, row) {
                 const value = this.getRowValue(row);
@@ -2887,7 +2885,7 @@ window.qBittorrent.DynamicTable = (function() {
                 const value2 = this.getRowValue(row2);
                 if ((typeof(value1) === 'number') && (typeof(value2) === 'number'))
                     return compareNumbers(value1, value2);
-                return naturalSortCollator.compare(value1, value2);
+                return window.qBittorrent.Misc.naturalSortCollator.compare(value1, value2);
             };
             column['updateTd'] = function(td, row) {
                 const value = this.getRowValue(row);
@@ -2974,7 +2972,7 @@ window.qBittorrent.DynamicTable = (function() {
                 const value2 = this.getRowValue(row2);
                 if ((typeof(value1) === 'number') && (typeof(value2) === 'number'))
                     return compareNumbers(value1, value2);
-                return naturalSortCollator.compare(value1, value2);
+                return window.qBittorrent.Misc.naturalSortCollator.compare(value1, value2);
             };
             column['updateTd'] = function(td, row) {
                 const value = this.getRowValue(row);
@@ -3024,7 +3022,7 @@ window.qBittorrent.DynamicTable = (function() {
                 const value2 = this.getRowValue(row2);
                 if ((typeof(value1) === 'number') && (typeof(value2) === 'number'))
                     return compareNumbers(value1, value2);
-                return naturalSortCollator.compare(value1, value2);
+                return window.qBittorrent.Misc.naturalSortCollator.compare(value1, value2);
             };
             column['updateTd'] = function(td, row) {
                 const value = this.getRowValue(row);
@@ -3066,7 +3064,7 @@ window.qBittorrent.DynamicTable = (function() {
 
         filterText: '',
 
-        filterdLength: function() {
+        filteredLength: function() {
             return this.tableBody.getElements('tr').length;
         },
 

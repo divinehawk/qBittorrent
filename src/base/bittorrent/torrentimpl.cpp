@@ -31,7 +31,6 @@
 
 #include <algorithm>
 #include <memory>
-#include <type_traits>
 
 #include <libtorrent/address.hpp>
 #include <libtorrent/alert_types.hpp>
@@ -46,7 +45,6 @@
 
 #include <QByteArray>
 #include <QDebug>
-#include <QFile>
 #include <QPointer>
 #include <QSet>
 #include <QStringList>
@@ -63,7 +61,6 @@
 #include "extensiondata.h"
 #include "loadtorrentparams.h"
 #include "ltqbitarray.h"
-#include "ltqhash.h"
 #include "lttypecast.h"
 #include "peeraddress.h"
 #include "peerinfo.h"
@@ -98,7 +95,7 @@ namespace
         QString firstTrackerMessage;
         QString firstErrorMessage;
 #ifdef QBT_USES_LIBTORRENT2
-        const auto numEndpoints = static_cast<qsizetype>(nativeEntry.endpoints.size() * ((hashes.has_v1() && hashes.has_v2()) ? 2 : 1));
+        const auto numEndpoints = static_cast<qsizetype>(nativeEntry.endpoints.size()) * ((hashes.has_v1() && hashes.has_v2()) ? 2 : 1);
         for (const lt::announce_endpoint &endpoint : nativeEntry.endpoints)
         {
             for (const auto protocolVersion : {lt::protocol_version::V1, lt::protocol_version::V2})
@@ -252,6 +249,7 @@ TorrentImpl::TorrentImpl(SessionImpl *session, lt::session *nativeSession
     , m_tags(params.tags)
     , m_ratioLimit(params.ratioLimit)
     , m_seedingTimeLimit(params.seedingTimeLimit)
+    , m_inactiveSeedingTimeLimit(params.inactiveSeedingTimeLimit)
     , m_operatingMode(params.operatingMode)
     , m_contentLayout(params.contentLayout)
     , m_hasFinishedStatus(params.hasFinishedStatus)
@@ -331,14 +329,14 @@ TorrentImpl::TorrentImpl(SessionImpl *session, lt::session *nativeSession
 
             // Remove .unwanted directory if empty
             const Path newPath = spath / newRelPath;
-            qDebug() << "Attempting to remove \".unwanted\" folder at " << (newPath / Path(u".unwanted"_qs)).toString();
-            Utils::Fs::rmdir(newPath / Path(u".unwanted"_qs));
+            qDebug() << "Attempting to remove \".unwanted\" folder at " << (newPath / Path(u".unwanted"_s)).toString();
+            Utils::Fs::rmdir(newPath / Path(u".unwanted"_s));
         }
     }
     // == END UPGRADE CODE ==
 }
 
-TorrentImpl::~TorrentImpl() {}
+TorrentImpl::~TorrentImpl() = default;
 
 bool TorrentImpl::isValid() const
 {
@@ -431,12 +429,16 @@ void TorrentImpl::setSavePath(const Path &path)
     if (resolvedPath == savePath())
         return;
 
-    m_savePath = resolvedPath;
-
-    m_session->handleTorrentNeedSaveResumeData(this);
-
     if (isFinished() || m_hasFinishedStatus || downloadPath().isEmpty())
-        moveStorage(savePath(), MoveStorageMode::KeepExistingFiles);
+    {
+        moveStorage(resolvedPath, MoveStorageContext::ChangeSavePath);
+    }
+    else
+    {
+        m_savePath = resolvedPath;
+        m_session->handleTorrentSavePathChanged(this);
+        m_session->handleTorrentNeedSaveResumeData(this);
+    }
 }
 
 Path TorrentImpl::downloadPath() const
@@ -454,13 +456,17 @@ void TorrentImpl::setDownloadPath(const Path &path)
     if (resolvedPath == m_downloadPath)
         return;
 
-    m_downloadPath = resolvedPath;
-
-    m_session->handleTorrentNeedSaveResumeData(this);
-
     const bool isIncomplete = !(isFinished() || m_hasFinishedStatus);
     if (isIncomplete)
-        moveStorage((m_downloadPath.isEmpty() ? savePath() : m_downloadPath), MoveStorageMode::KeepExistingFiles);
+    {
+        moveStorage((resolvedPath.isEmpty() ? savePath() : resolvedPath), MoveStorageContext::ChangeDownloadPath);
+    }
+    else
+    {
+        m_downloadPath = resolvedPath;
+        m_session->handleTorrentSavePathChanged(this);
+        m_session->handleTorrentNeedSaveResumeData(this);
+    }
 }
 
 Path TorrentImpl::rootPath() const
@@ -544,8 +550,7 @@ QVector<TrackerEntry> TorrentImpl::trackers() const
 
 void TorrentImpl::addTrackers(QVector<TrackerEntry> trackers)
 {
-    // TODO: use std::erase_if() in C++20
-    trackers.erase(std::remove_if(trackers.begin(), trackers.end(), [](const TrackerEntry &entry) { return entry.url.isEmpty(); }), trackers.end());
+    trackers.removeIf([](const TrackerEntry &entry) { return entry.url.isEmpty(); });
 
     const auto newTrackers = QSet<TrackerEntry>(trackers.cbegin(), trackers.cend())
             - QSet<TrackerEntry>(m_trackerEntries.cbegin(), m_trackerEntries.cend());
@@ -589,8 +594,7 @@ void TorrentImpl::removeTrackers(const QStringList &trackers)
 
 void TorrentImpl::replaceTrackers(QVector<TrackerEntry> trackers)
 {
-    // TODO: use std::erase_if() in C++20
-    trackers.erase(std::remove_if(trackers.begin(), trackers.end(), [](const TrackerEntry &entry) { return entry.url.isEmpty(); }), trackers.end());
+    trackers.removeIf([](const TrackerEntry &entry) { return entry.url.isEmpty(); });
     std::sort(trackers.begin(), trackers.end()
         , [](const TrackerEntry &lhs, const TrackerEntry &rhs) { return lhs.tier < rhs.tier; });
 
@@ -769,7 +773,13 @@ qreal TorrentImpl::progress() const
         return 1.;
 
     const qreal progress = static_cast<qreal>(m_nativeStatus.total_wanted_done) / m_nativeStatus.total_wanted;
-    Q_ASSERT((progress >= 0.f) && (progress <= 1.f));
+    if ((progress < 0.f) || (progress > 1.f))
+    {
+        LogMsg(tr("Unexpected data detected. Torrent: %1. Data: total_wanted=%2 total_wanted_done=%3.")
+                .arg(name(), QString::number(m_nativeStatus.total_wanted), QString::number(m_nativeStatus.total_wanted_done))
+                , Log::WARNING);
+    }
+
     return progress;
 }
 
@@ -847,6 +857,11 @@ qreal TorrentImpl::ratioLimit() const
 int TorrentImpl::seedingTimeLimit() const
 {
     return m_seedingTimeLimit;
+}
+
+int TorrentImpl::inactiveSeedingTimeLimit() const
+{
+    return m_inactiveSeedingTimeLimit;
 }
 
 Path TorrentImpl::filePath(const int index) const
@@ -1152,7 +1167,8 @@ qlonglong TorrentImpl::eta() const
     {
         const qreal maxRatioValue = maxRatio();
         const int maxSeedingTimeValue = maxSeedingTime();
-        if ((maxRatioValue < 0) && (maxSeedingTimeValue < 0)) return MAX_ETA;
+        const int maxInactiveSeedingTimeValue = maxInactiveSeedingTime();
+        if ((maxRatioValue < 0) && (maxSeedingTimeValue < 0) && (maxInactiveSeedingTimeValue < 0)) return MAX_ETA;
 
         qlonglong ratioEta = MAX_ETA;
 
@@ -1175,7 +1191,15 @@ qlonglong TorrentImpl::eta() const
                 seedingTimeEta = 0;
         }
 
-        return std::min(ratioEta, seedingTimeEta);
+        qlonglong inactiveSeedingTimeEta = MAX_ETA;
+
+        if (maxInactiveSeedingTimeValue >= 0)
+        {
+            inactiveSeedingTimeEta = (maxInactiveSeedingTimeValue * 60) - timeSinceActivity();
+            inactiveSeedingTimeEta = std::max<qlonglong>(inactiveSeedingTimeEta, 0);
+        }
+
+        return std::min({ratioEta, seedingTimeEta, inactiveSeedingTimeEta});
     }
 
     if (!speedAverage.download) return MAX_ETA;
@@ -1190,7 +1214,7 @@ QVector<qreal> TorrentImpl::filesProgress() const
 
     const int count = m_filesProgress.size();
     Q_ASSERT(count == filesCount());
-    if (Q_UNLIKELY(count != filesCount()))
+    if (count != filesCount()) [[unlikely]]
         return {};
 
     if (m_completedFiles.count(true) == count)
@@ -1370,6 +1394,14 @@ int TorrentImpl::maxSeedingTime() const
         return m_session->globalMaxSeedingMinutes();
 
     return m_seedingTimeLimit;
+}
+
+int TorrentImpl::maxInactiveSeedingTime() const
+{
+    if (m_inactiveSeedingTimeLimit == USE_GLOBAL_INACTIVE_SEEDING_TIME)
+        return m_session->globalMaxInactiveSeedingMinutes();
+
+    return m_inactiveSeedingTimeLimit;
 }
 
 qreal TorrentImpl::realRatio() const
@@ -1578,8 +1610,7 @@ TrackerEntry TorrentImpl::updateTrackerEntry(const lt::announce_entry &announceE
     });
 
     Q_ASSERT(it != m_trackerEntries.end());
-    // TODO: use [[unlikely]] in C++20
-    if (Q_UNLIKELY(it == m_trackerEntries.end()))
+    if (it == m_trackerEntries.end()) [[unlikely]]
         return {};
 
 #ifdef QBT_USES_LIBTORRENT2
@@ -1618,7 +1649,7 @@ void TorrentImpl::endReceivedMetadataHandling(const Path &savePath, const PathLi
     {
         const auto nativeIndex = nativeIndexes.at(i);
 
-        const Path actualFilePath = fileNames.at(i);
+        const Path &actualFilePath = fileNames.at(i);
         p.renamed_files[nativeIndex] = actualFilePath.toString().toStdString();
 
         const Path filePath = actualFilePath.removedExtension(QB_EXT);
@@ -1754,7 +1785,7 @@ void TorrentImpl::resume(const TorrentOperatingMode mode)
     }
 }
 
-void TorrentImpl::moveStorage(const Path &newPath, const MoveStorageMode mode)
+void TorrentImpl::moveStorage(const Path &newPath, const MoveStorageContext context)
 {
     if (!hasMetadata())
     {
@@ -1762,17 +1793,23 @@ void TorrentImpl::moveStorage(const Path &newPath, const MoveStorageMode mode)
         return;
     }
 
-    if (m_session->addMoveTorrentStorageJob(this, newPath, mode))
+    const auto mode = (context == MoveStorageContext::AdjustCurrentLocation)
+            ? MoveStorageMode::Overwrite : MoveStorageMode::KeepExistingFiles;
+    if (m_session->addMoveTorrentStorageJob(this, newPath, mode, context))
     {
-        m_storageIsMoving = true;
-        updateState();
+        if (!m_storageIsMoving)
+        {
+            m_storageIsMoving = true;
+            updateState();
+            m_session->handleTorrentStorageMovingStateChanged(this);
+        }
     }
 }
 
 void TorrentImpl::renameFile(const int index, const Path &path)
 {
     Q_ASSERT((index >= 0) && (index < filesCount()));
-    if (Q_UNLIKELY((index < 0) || (index >= filesCount())))
+    if ((index < 0) || (index >= filesCount())) [[unlikely]]
         return;
 
     const Path wantedPath = wantedActualPath(index, path);
@@ -1784,19 +1821,23 @@ void TorrentImpl::handleStateUpdate(const lt::torrent_status &nativeStatus)
     updateStatus(nativeStatus);
 }
 
-void TorrentImpl::handleMoveStorageJobFinished(const Path &path, const bool hasOutstandingJob)
+void TorrentImpl::handleMoveStorageJobFinished(const Path &path, const MoveStorageContext context, const bool hasOutstandingJob)
 {
-    m_session->handleTorrentNeedSaveResumeData(this);
+    if (context == MoveStorageContext::ChangeSavePath)
+        m_savePath = path;
+    else if (context == MoveStorageContext::ChangeDownloadPath)
+        m_downloadPath = path;
     m_storageIsMoving = hasOutstandingJob;
+    m_nativeStatus.save_path = path.toString().toStdString();
 
-    if (actualStorageLocation() != path)
-    {
-        m_nativeStatus.save_path = path.toString().toStdString();
-        m_session->handleTorrentSavePathChanged(this);
-    }
+    m_session->handleTorrentSavePathChanged(this);
+    m_session->handleTorrentNeedSaveResumeData(this);
 
     if (!m_storageIsMoving)
     {
+        updateState();
+        m_session->handleTorrentStorageMovingStateChanged(this);
+
         if (m_hasMissingFiles)
         {
             // it can be moved to the proper location
@@ -1991,6 +2032,7 @@ void TorrentImpl::prepareResumeData(const lt::add_torrent_params &params)
     resumeData.contentLayout = m_contentLayout;
     resumeData.ratioLimit = m_ratioLimit;
     resumeData.seedingTimeLimit = m_seedingTimeLimit;
+    resumeData.inactiveSeedingTimeLimit = m_inactiveSeedingTimeLimit;
     resumeData.firstLastPiecePriority = m_hasFirstLastPiecePriority;
     resumeData.hasFinishedStatus = m_hasFinishedStatus;
     resumeData.stopped = m_isStopped;
@@ -2127,7 +2169,7 @@ void TorrentImpl::handleMetadataReceivedAlert(const lt::metadata_received_alert 
 
 void TorrentImpl::handlePerformanceAlert(const lt::performance_alert *p) const
 {
-    LogMsg((tr("Performance alert: %1. More info: %2").arg(QString::fromStdString(p->message()), u"https://libtorrent.org/reference-Alerts.html#enum-performance-warning-t"_qs))
+    LogMsg((tr("Performance alert: %1. More info: %2").arg(QString::fromStdString(p->message()), u"https://libtorrent.org/reference-Alerts.html#enum-performance-warning-t"_s))
            , Log::INFO);
 }
 
@@ -2221,7 +2263,7 @@ void TorrentImpl::adjustStorageLocation()
     const Path targetPath = ((isFinished() || m_hasFinishedStatus || downloadPath.isEmpty()) ? savePath() : downloadPath);
 
     if ((targetPath != actualStorageLocation()) || isMoveInProgress())
-        moveStorage(targetPath, MoveStorageMode::Overwrite);
+        moveStorage(targetPath, MoveStorageContext::AdjustCurrentLocation);
 }
 
 void TorrentImpl::doRenameFile(int index, const Path &path)
@@ -2230,7 +2272,7 @@ void TorrentImpl::doRenameFile(int index, const Path &path)
 
     Q_ASSERT(index >= 0);
     Q_ASSERT(index < nativeIndexes.size());
-    if (Q_UNLIKELY((index < 0) || (index >= nativeIndexes.size())))
+    if ((index < 0) || (index >= nativeIndexes.size())) [[unlikely]]
         return;
 
     ++m_renameCount;
@@ -2318,11 +2360,11 @@ void TorrentImpl::updateStatus(const lt::torrent_status &nativeStatus)
 void TorrentImpl::updateProgress()
 {
     Q_ASSERT(hasMetadata());
-    if (Q_UNLIKELY(!hasMetadata()))
+    if (!hasMetadata()) [[unlikely]]
         return;
 
     Q_ASSERT(!m_filesProgress.isEmpty());
-    if (Q_UNLIKELY(m_filesProgress.isEmpty()))
+    if (m_filesProgress.isEmpty()) [[unlikely]]
         m_filesProgress.resize(filesCount());
 
     const QBitArray oldPieces = std::exchange(m_pieces, LT::toQBitArray(m_nativeStatus.pieces));
@@ -2378,6 +2420,21 @@ void TorrentImpl::setSeedingTimeLimit(int limit)
     if (m_seedingTimeLimit != limit)
     {
         m_seedingTimeLimit = limit;
+        m_session->handleTorrentNeedSaveResumeData(this);
+        m_session->handleTorrentShareLimitChanged(this);
+    }
+}
+
+void TorrentImpl::setInactiveSeedingTimeLimit(int limit)
+{
+    if (limit < USE_GLOBAL_INACTIVE_SEEDING_TIME)
+        limit = NO_INACTIVE_SEEDING_TIME_LIMIT;
+    else if (limit > MAX_INACTIVE_SEEDING_TIME)
+        limit = MAX_SEEDING_TIME;
+
+    if (m_inactiveSeedingTimeLimit != limit)
+    {
+        m_inactiveSeedingTimeLimit = limit;
         m_session->handleTorrentNeedSaveResumeData(this);
         m_session->handleTorrentShareLimitChanged(this);
     }
@@ -2464,7 +2521,7 @@ void TorrentImpl::flushCache() const
 
 QString TorrentImpl::createMagnetURI() const
 {
-    QString ret = u"magnet:?"_qs;
+    QString ret = u"magnet:?"_s;
 
     const SHA1Hash infoHash1 = infoHash().v1();
     if (infoHash1.isValid())
